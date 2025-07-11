@@ -114,3 +114,5 @@ Utilise-le à FOND pour PGI-IA !
 
 ---
 *Claude MAX : Unlimited Power for Unlimited Ambition* 🚀
+# 📈 Mise à jour : MAX → MAX 20x
+L'utilisateur avait déjà MAX, maintenant upgrade au forfait 20x (le plus puissant)

@@ -277,14 +277,23 @@ async function handleFileUpload(files) {
 
 // Backend status check
 async function checkBackendStatus() {
+    const statusEl = document.getElementById('backend-status');
+    const spinner = document.getElementById('loading-spinner');
+    
     try {
+        // Show loading state
+        spinner.style.display = 'inline-block';
+        statusEl.innerHTML = '<span class="loading-spinner mr-2"></span>Connexion...';
+        
         const response = await fetch(`${API_BASE}/`);
         if (response.ok) {
             const data = await response.json();
-            document.getElementById('backend-status').textContent = `✅ ${data.status}`;
+            spinner.style.display = 'none';
+            statusEl.textContent = `✅ ${data.status}`;
         }
     } catch (error) {
-        document.getElementById('backend-status').textContent = '❌ Hors ligne';
+        spinner.style.display = 'none';
+        statusEl.textContent = '❌ Hors ligne';
     }
 }
 

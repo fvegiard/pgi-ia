@@ -25,6 +25,45 @@
         .status-approuve { color: #10B981; border: 2px solid #10B981; background-color: transparent; }
         .status-a-preparer { color: #FBBF24; border: 2px solid #FBBF24; background-color: transparent; }
         .status-sans-frais { background-color: #6B7280; color: white; }
+        
+        /* Auto-améliorations UX */
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            text-left;
+            background: none;
+            border: none;
+            border-radius: 0.5rem;
+            color: #9CA3AF;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .nav-btn:hover { background-color: #374151; color: #F3F4F6; }
+        .nav-btn.active { background-color: #1F2937; color: #3B82F6; }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #374151;
+            border-radius: 50%;
+            border-top-color: #3B82F6;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .sidebar-navigation { padding: 1rem; }
+        
+        /* Mobile responsive fixes */
+        @media (max-width: 640px) {
+            .sidebar-navigation { padding: 0.5rem; }
+            .nav-btn { padding: 0.5rem; font-size: 0.8rem; }
+            .w-80 { width: 100%; }
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-200">
@@ -46,16 +85,19 @@
                 <h1 class="text-xl font-bold text-white mb-1">PGI-IA</h1>
                 <p class="text-sm text-gray-400">Plateforme de Gestion et d'Orchestration v4.1</p>
                 <div class="mt-3 flex items-center">
-                    <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
-                    <span id="backend-status" class="text-sm text-gray-300">🔄 Connexion...</span>
+                    <div class="w-2 h-2 bg-green-400 rounded-full mr-2" aria-hidden="true"></div>
+                    <span id="backend-status" class="text-sm text-gray-300">
+                        <span class="loading-spinner mr-2" id="loading-spinner"></span>
+                        Connexion...
+                    </span>
                 </div>
             </div>
 
             <!-- Navigation Menu -->
-            <nav class="flex-1 p-4">
+            <nav class="sidebar-navigation flex-1 p-4" role="navigation" aria-label="Navigation principale">
                 <div class="space-y-2">
-                    <button class="nav-btn active" data-tab="dashboard">
-                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <button class="nav-btn active" data-tab="dashboard" aria-label="Aller à la chronologie du projet">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m4 0v-7a1 1 0 011-1h1a1 1 0 011 1v7m-3 0h3m0 0h3M9 7h6m0 0v10"></path>
                         </svg>
                         Chronologie

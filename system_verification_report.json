@@ -1,0 +1,77 @@
+{
+  "timestamp": "2025-07-11T06:02:19.897516",
+  "system_status": "PARTIAL",
+  "success_rate": 93.61702127659575,
+  "passed_checks": 44,
+  "total_checks": 47,
+  "errors": [
+    "D\u00e9pendance manquante: PyPDF2",
+    "D\u00e9pendance manquante: flask-cors",
+    "D\u00e9pendance manquante: pyyaml"
+  ],
+  "warnings": [
+    "Cl\u00e9 API manquante: ANTHROPIC_API_KEY",
+    "Cl\u00e9 API manquante: GOOGLE_API_KEY"
+  ],
+  "verification_results": {
+    "apis": {
+      "OPENAI_API_KEY": true,
+      "DEEPSEEK_API_KEY": true,
+      "ANTHROPIC_API_KEY": false,
+      "GOOGLE_API_KEY": false,
+      "deepseek_connection": true,
+      "openai_connection": false
+    },
+    "tools": {
+      "git": true,
+      "python3": true,
+      "pip": true,
+      "nvidia-smi": true,
+      "curl": true,
+      "wget": true
+    },
+    "dependencies": {
+      "torch": true,
+      "transformers": true,
+      "datasets": true,
+      "peft": true,
+      "bitsandbytes": true,
+      "PyPDF2": true,
+      "PyMuPDF": true,
+      "easyocr": true,
+      "opencv-python": true,
+      "Pillow": true,
+      "flask": true,
+      "flask-cors": true,
+      "requests": true,
+      "pandas": true,
+      "numpy": true,
+      "tqdm": true,
+      "pyyaml": true,
+      "rich": true,
+      "psutil": true
+    },
+    "services": {
+      "flask": true
+    },
+    "files": {
+      "backend/main.py": true,
+      "backend/requirements.txt": true,
+      "frontend/index.html": true,
+      "frontend/script.js": true,
+      "config/agents.yaml": true,
+      "deepseek_training_dataset.jsonl": true,
+      "train_deepseek_kahnawake_plans.py": true,
+      "deepseek_finetune_english_complete.py": true,
+      "audit_deepseek.py": true,
+      "audit_justina.py": true,
+      "README.md": true,
+      "CLAUDE.md": true
+    },
+    "system": {
+      "python": true,
+      "gpu": true,
+      "memory": 11.678367614746094
+    }
+  }
+}

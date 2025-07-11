@@ -1,0 +1,5 @@
+# Renommer ce fichier en agents.yaml et renseigner vos clés API pour les agents.
+
+openai_api_key: "VOTRE_CLE_OPENAI_ICI"
+claude_api_key: "VOTRE_CLE_CLAUDE_ICI"
+# Ajoutez d'autres clés d'agents si nécessaire.

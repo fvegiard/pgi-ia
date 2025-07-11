@@ -1,0 +1,30 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+venv/
+env/
+
+# Configurations
+config/agents.yaml
+
+# Data folders
+data/drop_zone/
+
+# IDEs and editors
+.vscode/
+.idea/
+
+# Test artifacts
+.pytest_cache/
+
+# Mypy cache
+.mypy_cache/

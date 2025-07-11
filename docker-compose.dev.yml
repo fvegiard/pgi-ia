@@ -1,0 +1,72 @@
+# Docker Compose pour développement avec hot-reload
+version: '3.8'
+
+services:
+  # Backend avec hot-reload
+  backend-dev:
+    build: 
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    container_name: pgi-ia-backend-dev
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=development
+      - FLASK_DEBUG=1
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    volumes:
+      # Mount du code source pour hot-reload
+      - ./backend:/app/backend
+      - ./config:/app/config
+      - ./*.py:/app/
+      - ./plans_kahnawake:/app/plans_kahnawake
+      - ./plans_alexis_nihon:/app/plans_alexis_nihon
+    command: flask run --host=0.0.0.0 --reload
+    networks:
+      - pgi-network
+
+  # Frontend avec live-reload
+  frontend-dev:
+    image: node:18-alpine
+    container_name: pgi-ia-frontend-dev
+    working_dir: /app
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend:/app
+    command: >
+      sh -c "npm install -g live-server && 
+             live-server --port=3000 --host=0.0.0.0"
+    networks:
+      - pgi-network
+
+  # Services minimaux pour dev
+  redis:
+    image: redis:7-alpine
+    container_name: pgi-ia-redis-dev
+    ports:
+      - "6379:6379"
+    networks:
+      - pgi-network
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: pgi-ia-postgres-dev
+    environment:
+      - POSTGRES_USER=pgiia
+      - POSTGRES_PASSWORD=pgiia
+      - POSTGRES_DB=pgiia
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data_dev:/var/lib/postgresql/data
+    networks:
+      - pgi-network
+
+networks:
+  pgi-network:
+    driver: bridge
+
+volumes:
+  postgres_data_dev:

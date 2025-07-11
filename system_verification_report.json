@@ -1,26 +1,27 @@
 {
-  "timestamp": "2025-07-11T06:02:19.897516",
+  "timestamp": "2025-07-11T06:50:17.507501",
   "system_status": "PARTIAL",
-  "success_rate": 93.61702127659575,
-  "passed_checks": 44,
-  "total_checks": 47,
+  "success_rate": 88.88888888888889,
+  "passed_checks": 40,
+  "total_checks": 45,
   "errors": [
     "D\u00e9pendance manquante: PyPDF2",
     "D\u00e9pendance manquante: flask-cors",
     "D\u00e9pendance manquante: pyyaml"
   ],
   "warnings": [
+    "Cl\u00e9 API manquante: OPENAI_API_KEY",
+    "Cl\u00e9 API manquante: DEEPSEEK_API_KEY",
     "Cl\u00e9 API manquante: ANTHROPIC_API_KEY",
-    "Cl\u00e9 API manquante: GOOGLE_API_KEY"
+    "Cl\u00e9 API manquante: GOOGLE_API_KEY",
+    "Backend Flask non d\u00e9marr\u00e9"
   ],
   "verification_results": {
     "apis": {
-      "OPENAI_API_KEY": true,
-      "DEEPSEEK_API_KEY": true,
+      "OPENAI_API_KEY": false,
+      "DEEPSEEK_API_KEY": false,
       "ANTHROPIC_API_KEY": false,
-      "GOOGLE_API_KEY": false,
-      "deepseek_connection": true,
-      "openai_connection": false
+      "GOOGLE_API_KEY": false
     },
     "tools": {
       "git": true,
@@ -52,7 +53,7 @@
       "psutil": true
     },
     "services": {
-      "flask": true
+      "flask": false
     },
     "files": {
       "backend/main.py": true,

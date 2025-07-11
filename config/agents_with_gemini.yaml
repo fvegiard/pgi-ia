@@ -1,0 +1,54 @@
+# Configuration multi-agents avec Gemini
+agents:
+  - name: "Léa"
+    role: "Orchestrateur Principal"
+    speciality: "Électricité industrielle, gestion projet"
+    model: "deepseek-chat"
+    api_key: "${DEEPSEEK_API_KEY}"
+    
+  - name: "Justina"
+    role: "Auditrice UX"
+    speciality: "Interface utilisateur, expérience client"
+    model: "deepseek-chat"
+    api_key: "${DEEPSEEK_API_KEY}"
+    
+  - name: "DeepSeek Expert"
+    role: "Expert Technique"
+    speciality: "Analyse technique, optimisation code"
+    model: "deepseek-coder"
+    api_key: "${DEEPSEEK_API_KEY}"
+    
+  - name: "Gemini Analyst"
+    role: "Analyste Documents"
+    speciality: "OCR avancé, extraction données PDF"
+    model: "gemini-1.5-flash"
+    api_key: "${GEMINI_API_KEY}"
+    
+  - name: "Gemini Estimator"
+    role: "Estimateur"
+    speciality: "Calculs coûts, génération devis"
+    model: "gemini-1.5-pro"
+    api_key: "${GEMINI_API_KEY}"
+
+# Configuration des modèles disponibles
+models:
+  deepseek:
+    - deepseek-chat
+    - deepseek-coder
+  gemini:
+    - gemini-1.5-flash  # Gratuit, rapide
+    - gemini-1.5-pro    # Plus puissant
+  openai:
+    - gpt-3.5-turbo
+    - gpt-4
+  anthropic:
+    - claude-3-sonnet
+    - claude-3-opus
+
+# Orchestration
+orchestration:
+  default_agent: "Léa"
+  fallback_agent: "DeepSeek Expert"
+  pdf_analysis: "Gemini Analyst"
+  estimation: "Gemini Estimator"
+  ui_validation: "Justina"

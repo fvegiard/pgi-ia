@@ -1,0 +1,128 @@
+# Docker Compose pour PGI-IA
+version: '3.8'
+
+services:
+  # Backend Flask principal
+  backend:
+    build: 
+      context: .
+      dockerfile: docker/backend.Dockerfile
+    container_name: pgi-ia-backend
+    ports:
+      - "5000:5000"
+    environment:
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - REDIS_URL=redis://redis:6379/0
+      - DATABASE_URL=postgresql://pgiia:pgiia@postgres:5432/pgiia
+    volumes:
+      - ./plans_kahnawake:/app/plans_kahnawake
+      - ./plans_alexis_nihon:/app/plans_alexis_nihon
+      - ./downloads:/app/downloads
+      - ./models:/app/models
+    depends_on:
+      - redis
+      - postgres
+    networks:
+      - pgi-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # Service Gemini dédié
+  gemini-service:
+    build:
+      context: .
+      dockerfile: docker/gemini.Dockerfile
+    container_name: pgi-ia-gemini
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    volumes:
+      - ./plans_kahnawake:/app/plans_kahnawake
+      - ./plans_alexis_nihon:/app/plans_alexis_nihon
+    networks:
+      - pgi-network
+
+  # Service DeepSeek dédié
+  deepseek-service:
+    build:
+      context: .
+      dockerfile: docker/deepseek.Dockerfile
+    container_name: pgi-ia-deepseek
+    environment:
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
+    volumes:
+      - ./models:/app/models
+    networks:
+      - pgi-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+  # Frontend (optionnel si tu veux servir via Docker)
+  frontend:
+    image: nginx:alpine
+    container_name: pgi-ia-frontend
+    ports:
+      - "80:80"
+    volumes:
+      - ./frontend:/usr/share/nginx/html
+      - ./docker/nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - pgi-network
+
+  # Base de données PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: pgi-ia-postgres
+    environment:
+      - POSTGRES_USER=pgiia
+      - POSTGRES_PASSWORD=pgiia
+      - POSTGRES_DB=pgiia
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - pgi-network
+
+  # Cache Redis
+  redis:
+    image: redis:7-alpine
+    container_name: pgi-ia-redis
+    networks:
+      - pgi-network
+
+  # Service OCR dédié (EasyOCR)
+  ocr-service:
+    build:
+      context: .
+      dockerfile: docker/ocr.Dockerfile
+    container_name: pgi-ia-ocr
+    volumes:
+      - ./plans_kahnawake:/app/plans_kahnawake
+      - ./plans_alexis_nihon:/app/plans_alexis_nihon
+    networks:
+      - pgi-network
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+
+networks:
+  pgi-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

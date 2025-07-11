@@ -55,4 +55,6 @@ config/agents.yaml
 *.tmp
 *.temp
 tmp/
-temp/
+temp/# Ignorer les cookies de session Google
+.google_session/
+google_session_cookies.json

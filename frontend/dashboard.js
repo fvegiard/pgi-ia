@@ -5,6 +5,11 @@ const script = document.createElement('script');
 script.src = 'dashboard_real_data.js';
 document.head.appendChild(script);
 
+// Import real emails data
+const emailScript = document.createElement('script');
+emailScript.src = 'emails_real_data.js';
+document.head.appendChild(emailScript);
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize Lucide icons
     lucide.createIcons();
@@ -399,15 +404,139 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Load real emails
+    function loadRealEmails() {
+        const emailContainer = document.querySelector('#emails .divide-y');
+        if (!emailContainer || !window.REAL_EMAILS_DATA) return;
+        
+        // Clear existing sample emails
+        emailContainer.innerHTML = '';
+        
+        // Load real emails
+        window.REAL_EMAILS_DATA.realEmails.forEach(email => {
+            const priorityClass = email.priority === 'high' ? 'email-priority-high' : 
+                                email.priority === 'normal' ? 'email-priority-normal' : 'email-priority-low';
+            
+            const typeColors = {
+                'qrt': 'bg-purple-100 text-purple-800',
+                'directive': 'bg-blue-100 text-blue-800',
+                'changement': 'bg-orange-100 text-orange-800',
+                'plan': 'bg-green-100 text-green-800',
+                'coordination': 'bg-gray-100 text-gray-800',
+                'bon_travail': 'bg-yellow-100 text-yellow-800'
+            };
+            
+            const typeLabel = {
+                'qrt': 'QRT',
+                'directive': 'Directive',
+                'changement': 'Changement',
+                'plan': 'Plan',
+                'coordination': 'Coordination',
+                'bon_travail': 'Bon de travail'
+            };
+            
+            const emailHtml = `
+                <div class="p-4 hover:bg-gray-50 cursor-pointer email-item ${priorityClass} ${email.unread ? '' : 'opacity-75'}">
+                    <div class="flex items-start space-x-3">
+                        <input type="checkbox" class="mt-1">
+                        <div class="flex-1">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center space-x-2">
+                                    <span class="${email.unread ? 'font-semibold text-gray-900' : 'text-gray-700'}">${email.from.split('<')[0].trim()}</span>
+                                    ${email.unread ? '<span class="bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded">Non lu</span>' : ''}
+                                    <span class="${typeColors[email.type]} text-xs px-2 py-0.5 rounded">${typeLabel[email.type]}</span>
+                                    ${email.qrtNumber ? `<span class="text-xs text-gray-600">#${email.qrtNumber}</span>` : ''}
+                                    ${email.directiveNumber ? `<span class="text-xs text-gray-600">${email.directiveNumber}</span>` : ''}
+                                </div>
+                                <span class="text-sm text-gray-500">${formatEmailDate(email.date)}</span>
+                            </div>
+                            <h4 class="${email.unread ? 'font-medium' : ''} mt-1">${email.subject}</h4>
+                            <p class="text-sm text-gray-600 mt-1">${email.preview}</p>
+                            <div class="flex items-center space-x-4 mt-2 text-sm">
+                                <span class="text-gray-500">Projet: ${email.projectName}</span>
+                                ${email.priority === 'high' ? '<span class="text-orange-600 font-medium">Priorité haute</span>' : ''}
+                                ${email.attachments && email.attachments.length > 0 ? 
+                                    `<span class="flex items-center text-gray-600">
+                                        <i data-lucide="paperclip" class="w-4 h-4 mr-1"></i>
+                                        ${email.attachments.length} fichier(s)
+                                    </span>` : ''}
+                                ${email.actions && email.actions.length > 0 ? 
+                                    `<button class="text-blue-600 hover:underline" onclick="processEmailAction(${email.id})">
+                                        ${email.actions[0].label}
+                                    </button>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            emailContainer.innerHTML += emailHtml;
+        });
+        
+        // Update Lucide icons
+        lucide.createIcons();
+        
+        // Update email stats
+        updateEmailStats();
+    }
+    
+    // Format email date
+    function formatEmailDate(dateStr) {
+        const date = new Date(dateStr);
+        const now = new Date();
+        const diff = now - date;
+        const minutes = Math.floor(diff / 60000);
+        const hours = Math.floor(diff / 3600000);
+        const days = Math.floor(diff / 86400000);
+        
+        if (minutes < 60) return `Il y a ${minutes} min`;
+        if (hours < 24) return `Il y a ${hours}h`;
+        if (days === 1) return 'Hier';
+        if (days < 7) return `Il y a ${days} jours`;
+        return date.toLocaleDateString('fr-CA');
+    }
+    
+    // Update email statistics
+    function updateEmailStats() {
+        if (!window.REAL_EMAILS_DATA) return;
+        
+        // Update stats cards
+        const totalEl = document.querySelector('#emails .text-2xl.font-bold');
+        if (totalEl) totalEl.textContent = window.REAL_EMAILS_DATA.emailStats.total;
+        
+        const unreadEl = document.querySelector('#emails .text-red-600.text-2xl');
+        if (unreadEl) unreadEl.textContent = window.REAL_EMAILS_DATA.emailStats.unread;
+        
+        // Update badge
+        const emailBadge = document.getElementById('emailBadge');
+        if (emailBadge) emailBadge.textContent = window.REAL_EMAILS_DATA.emailStats.unread;
+    }
+    
+    // Process email action
+    window.processEmailAction = function(emailId) {
+        const email = window.REAL_EMAILS_DATA.realEmails.find(e => e.id === emailId);
+        if (!email) return;
+        
+        showNotification(`Traitement de: ${email.actions[0].label}`, 'info');
+        
+        // Simulate processing
+        setTimeout(() => {
+            showNotification(`Action complétée pour ${email.subject}`, 'success');
+        }, 2000);
+    };
+    
     // Initialize everything
     initCharts();
     setupEmailHandlers();
     updateEmailBadge();
     simulateRealTimeUpdates();
     
-    // Load real data after a short delay to ensure dashboard_real_data.js is loaded
+    // Load real data after a short delay to ensure all data files are loaded
     setTimeout(() => {
         updateDashboardStats();
+        if (window.REAL_EMAILS_DATA) {
+            loadRealEmails();
+        }
     }, 100);
 
     // Add some interactivity to other elements

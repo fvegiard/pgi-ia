@@ -1,0 +1,45 @@
+{
+  "project": "PGI-IA",
+  "version": "4.1",
+  "description": "Progiciel de Gestion Intégré assisté par Intelligence Artificielle",
+  "documentation": {
+    "main": "CLAUDE.md",
+    "desktop_setup": "CLAUDE_DESKTOP_SETUP.md",
+    "project_summary": "MISSION_ACCOMPLIE.md",
+    "readme": "README.md"
+  },
+  "environment": {
+    "python_version": "3.12+",
+    "venv_path": "venv_pgi_ia",
+    "backend_port": 5000,
+    "gpu_required": true
+  },
+  "quick_commands": {
+    "activate": "source venv_pgi_ia/bin/activate",
+    "start_all": "python start_all_services.py",
+    "backend": "python backend/main.py",
+    "verify": "python verify_complete_system.py",
+    "audit_deepseek": "python audit_deepseek.py",
+    "audit_justina": "python audit_justina.py",
+    "train": "python deepseek_finetune_english_complete.py"
+  },
+  "paths": {
+    "wsl": "/home/fvegi/dev/pgi-ia",
+    "windows": "C:\\Users\\fvegi\\dev\\pgi-ia",
+    "claude_desktop": "/mnt/c/Users/fvegi/dev/pgi-ia"
+  },
+  "apis": {
+    "openai": "configured",
+    "deepseek": "configured",
+    "anthropic": "optional",
+    "google": "optional"
+  },
+  "features": [
+    "Timeline temps réel",
+    "Drag-drop PDF upload",
+    "OCR automatique (EasyOCR)",
+    "Fine-tuning DeepSeek local",
+    "Multi-agents orchestration",
+    "Audits automatisés"
+  ]
+}

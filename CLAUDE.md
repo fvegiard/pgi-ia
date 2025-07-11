@@ -1,5 +1,9 @@
 # Configuration Claude Code pour PGI-IA
 
+## 🔗 Guides associés
+- **Claude Desktop**: Voir [CLAUDE_DESKTOP_SETUP.md](./CLAUDE_DESKTOP_SETUP.md) pour utilisation dans Claude Desktop
+- **Mission accomplie**: Voir [MISSION_ACCOMPLIE.md](./MISSION_ACCOMPLIE.md) pour le résumé complet du projet
+
 ## Environnement de développement
 - **Projet**: PGI-IA (Progiciel de Gestion Intégré assisté par Intelligence Artificielle)
 - **Langage principal**: Python 3.12+
@@ -97,6 +101,25 @@ export GOOGLE_API_KEY="..."        # Optionnel
 3. Ouverture frontend dans navigateur
 4. Tests et audits réguliers
 5. Entraînement modèles selon besoins
+
+## 🔄 Synchronisation multi-environnements
+
+### WSL ↔ Claude Desktop
+```bash
+# Dans WSL
+cd /home/fvegi/dev/pgi-ia
+git pull origin main
+
+# Dans Claude Desktop
+cd /mnt/c/Users/fvegi/dev/pgi-ia
+git pull origin main
+```
+
+### Fichiers de configuration
+- `CLAUDE.md` - Configuration générale (ce fichier)
+- `CLAUDE_DESKTOP_SETUP.md` - Guide spécifique Claude Desktop
+- `README.md` - Documentation projet
+- `.gitignore` - Fichiers ignorés par Git
 
 ## Commandes git
 ```bash

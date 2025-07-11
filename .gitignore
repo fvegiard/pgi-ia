@@ -1,30 +1,58 @@
-# Byte-compiled / optimized / DLL files
+# Python
 __pycache__/
 *.py[cod]
 *$py.class
-
-# Distribution / packaging
-build/
-dist/
-*.egg-info/
-.eggs/
-
-# Virtual environments
+*.so
+.Python
 venv/
+venv_pgi_ia/
 env/
+ENV/
+.venv
 
-# Configurations
-config/agents.yaml
+# Logs
+*.log
+logs/
+system_verification.log
+deepseek_finetune_complete.log
+backend_test.log
 
-# Data folders
-data/drop_zone/
-
-# IDEs and editors
+# IDE
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# Test artifacts
-.pytest_cache/
+# OS
+.DS_Store
+Thumbs.db
 
-# Mypy cache
-.mypy_cache/
+# Project specific
+data/drop_zone/
+deepseek_training_complete/
+deepseek_finetuned_complete/
+plans_kahnawake/
+plans_alexis_nihon/
+*.pdf
+*.pkl
+*.pth
+*.bin
+
+# Reports (optional - you may want to keep these)
+# startup_report.json
+# system_verification_report.json
+
+# API Keys and Config
+.env
+config/agents.yaml
+!config/agents.example.yaml
+
+# Cache
+.cache/
+*.cache
+
+# Temporary files
+*.tmp
+*.temp
+tmp/
+temp/

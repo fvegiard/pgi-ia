@@ -1,16 +1,29 @@
 """
 PGI-IA Backend API
-Plateforme de Gestion Intégrée avec Intelligence Artificielle
+Progiciel de Gestion Intégré assisté par Intelligence Artificielle
+Développé pour DR Électrique - Francis Végiard
 """
 
-from fastapi import FastAPI, File, UploadFile, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
-from contextlib import asynccontextmanager
-import logging
-from pathlib import Path
+from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
 import os
+import yaml
+import logging
 from datetime import datetime
+import json
+
+# Import des agents
+try:
+    from agents.directive_agent import DirectiveAgent
+    from core.orchestrator import AgentOrchestrator
+except ImportError:
+    print("⚠️ Modules agents non trouvés - Mode démo activé")
+    DirectiveAgent = None
+    AgentOrchestrator = None
+
+# Configuration
+app = Flask(__name__)
+CORS(app)
 
 # Configuration logging
 logging.basicConfig(
@@ -19,168 +32,183 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Créer les dossiers nécessaires
-UPLOAD_DIR = Path("uploads")
-UPLOAD_DIR.mkdir(exist_ok=True)
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Gestion du cycle de vie de l'application"""
-    logger.info("🚀 Démarrage PGI-IA Backend...")
-    yield
-    logger.info("🛑 Arrêt PGI-IA Backend...")
-
-# Initialisation FastAPI
-app = FastAPI(
-    title="PGI-IA API",
-    description="API pour la Plateforme de Gestion Intégrée avec Intelligence Artificielle",
-    version="0.1.0",
-    lifespan=lifespan
-)
-
-# Configuration CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # En production, spécifier les origines autorisées
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Routes de base
-@app.get("/")
-async def root():
-    """Route racine - Vérification que l'API fonctionne"""
-    return {
-        "message": "PGI-IA API est opérationnelle! 🚀",
-        "version": "0.1.0",
-        "timestamp": datetime.now().isoformat()
-    }
-
-@app.get("/health")
-async def health_check():
-    """Vérification de santé de l'API"""
-    return {
-        "status": "healthy",
-        "service": "pgi-ia-backend",
-        "timestamp": datetime.now().isoformat()
-    }
-
-# Upload de fichiers
-@app.post("/api/upload")
-async def upload_file(file: UploadFile = File(...)):
-    """
-    Upload d'un fichier pour traitement par l'orchestrateur
-    
-    Types supportés:
-    - PDF (plans, directives)
-    - Images (photos chantier)
-    - Emails (.eml, .msg)
-    """
+# Chargement configuration agents
+def load_config():
+    """Charge la configuration des agents IA"""
     try:
-        # Validation du type de fichier
-        allowed_extensions = {'.pdf', '.jpg', '.jpeg', '.png', '.eml', '.msg', '.docx'}
-        file_extension = Path(file.filename).suffix.lower()
-        
-        if file_extension not in allowed_extensions:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Type de fichier non supporté: {file_extension}"
-            )
-        
-        # Sauvegarde du fichier
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        safe_filename = f"{timestamp}_{file.filename}"
-        file_path = UPLOAD_DIR / safe_filename
-        
-        content = await file.read()
-        with open(file_path, "wb") as f:
-            f.write(content)
-        
-        logger.info(f"📁 Fichier reçu: {file.filename} ({len(content)} bytes)")
-        
-        # TODO: Appeler l'orchestrateur ici
-        # orchestrator.process_file(file_path)
-        
-        return {
-            "status": "success",
-            "filename": file.filename,
-            "size": len(content),
-            "path": str(file_path),
-            "message": "Fichier uploadé avec succès. Traitement en cours..."
+        config_path = os.path.join('config', 'agents.yaml')
+        if not os.path.exists(config_path):
+            config_path = os.path.join('config', 'agents.example.yaml')
+            logger.warning("Utilisation du fichier example - Créez config/agents.yaml")
+            
+        with open(config_path, 'r', encoding='utf-8') as f:
+            return yaml.safe_load(f)
+    except Exception as e:
+        logger.error(f"Erreur chargement config: {e}")
+        return None
+
+# Initialisation
+config = load_config()
+orchestrator = None
+
+if config and AgentOrchestrator:
+    try:
+        orchestrator = AgentOrchestrator(config)
+        logger.info("✅ PGI-IA Backend initialisé avec succès")
+    except Exception as e:
+        logger.error(f"Erreur init orchestrateur: {e}")
+else:
+    logger.info("🔄 Mode démo - Configuration orchestrateur à compléter")
+
+@app.route('/')
+def index():
+    """Page d'accueil API"""
+    return jsonify({
+        "service": "PGI-IA Backend API",
+        "version": "1.0.0",
+        "status": "🚀 Opérationnel",
+        "mode": "Production" if orchestrator else "Démo",
+        "endpoints": {
+            "/upload": "POST - Upload fichiers (PDF, images, plans)",
+            "/directive/process": "POST - Traitement directive PDF",
+            "/plan/analyze": "POST - Analyse plan 2D → 3D",
+            "/photo/geolocate": "POST - Géolocalisation photo",
+            "/projects": "GET - Liste projets actifs",
+            "/ai/command": "POST - Commande IA naturelle"
         }
+    })
+
+@app.route('/upload', methods=['POST'])
+def upload_file():
+    """Upload et traitement automatique des fichiers"""
+    try:
+        if 'file' not in request.files:
+            return jsonify({"error": "Aucun fichier fourni"}), 400
+            
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({"error": "Nom fichier vide"}), 400
+            
+        # Sauvegarde dans drop_zone
+        os.makedirs('data/drop_zone', exist_ok=True)
+        upload_path = os.path.join('data', 'drop_zone', file.filename)
+        file.save(upload_path)
+        
+        # Détection type et traitement approprié
+        file_ext = file.filename.lower().split('.')[-1]
+        
+        result = {
+            "id": f"AUTO-{datetime.now().strftime('%Y%m%d-%H%M%S')}",
+            "date_recue": datetime.now().strftime("%Y-%m-%d"),
+            "description": f"Fichier {file.filename} traité automatiquement",
+            "prix": "À déterminer",
+            "po_client": "",
+            "statut": "À préparer",
+            "ai_enhanced": False
+        }
+        
+        if file_ext == 'pdf' and orchestrator:
+            # Traitement directive PDF
+            try:
+                result = orchestrator.process_directive(upload_path)
+            except Exception as e:
+                logger.error(f"Erreur traitement PDF: {e}")
+                result["description"] = f"Erreur traitement {file.filename}: {str(e)}"
+        
+        return jsonify({
+            "status": "✅ Traitement terminé",
+            "file": file.filename,
+            "type": file_ext,
+            "result": result,
+            "timestamp": datetime.now().isoformat()
+        })
         
     except Exception as e:
-        logger.error(f"Erreur lors de l'upload: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Erreur upload: {e}")
+        return jsonify({"error": str(e)}), 500
 
-# Routes projets
-@app.get("/api/projects")
-async def get_projects():
-    """Récupérer la liste des projets"""
-    # TODO: Récupérer depuis la base de données
-    return [
-        {
-            "id": "kahnawake",
-            "name": "S-1086 - Musée Kahnawake",
-            "status": "estimation",
-            "progress": 25
-        },
-        {
-            "id": "alexis_nihon",
-            "name": "C-24-048 - Place Alexis-Nihon",
-            "status": "construction",
-            "progress": 60
-        }
-    ]
-
-@app.get("/api/projects/{project_id}/directives")
-async def get_project_directives(project_id: str):
-    """Récupérer les directives d'un projet"""
-    # TODO: Récupérer depuis la base de données
-    
-    # Pour l'instant, retourner des données de test
-    if project_id == "kahnawake":
-        return [
-            {
-                "id": "CO-ME-039",
-                "date": "2025-06-16",
-                "description": "Repositionnement des luminaires sur rail",
-                "status": "À préparer",
-                "price": 0
+@app.route('/projects', methods=['GET'])
+def get_projects():
+    """Retourne la liste des projets actifs"""
+    try:
+        projects = {
+            "kahnawake": {
+                "id": "S-1086",
+                "nom": "Musée Kahnawake", 
+                "statut": "Estimation",
+                "po_client": "QMD",
+                "directives_count": 4,
+                "derniere_maj": "2025-01-10"
+            },
+            "alexis_nihon": {
+                "id": "C-24-048",
+                "nom": "Place Alexis-Nihon",
+                "statut": "Construction", 
+                "po_client": "JCB",
+                "directives_count": 5,
+                "derniere_maj": "2025-01-09"
             }
-        ]
-    
-    return []
-
-@app.get("/api/projects/{project_id}/timeline")
-async def get_project_timeline(project_id: str):
-    """Récupérer la chronologie d'un projet"""
-    # TODO: Récupérer depuis la base de données
-    
-    return [
-        {
-            "id": "evt-001",
-            "timestamp": "2025-07-09T08:15:00",
-            "type": "file_upload",
-            "title": "Plan E-101 Rev A reçu",
-            "description": "Fichier PDF du plan électrique principal déposé.",
-            "icon": "file-pdf"
         }
-    ]
+        return jsonify(projects)
+        
+    except Exception as e:
+        logger.error(f"Erreur projets: {e}")
+        return jsonify({"error": str(e)}), 500
 
-# WebSocket pour temps réel (à implémenter)
-# @app.websocket("/ws")
-# async def websocket_endpoint(websocket: WebSocket):
-#     await websocket.accept()
-#     # Logique WebSocket ici
+@app.route('/ai/command', methods=['POST'])
+def ai_command():
+    """Interface commande IA naturelle"""
+    try:
+        data = request.get_json()
+        command = data.get('command', '')
+        
+        if not command:
+            return jsonify({"error": "Commande vide"}), 400
+        
+        # Traitement basique si orchestrateur disponible
+        if orchestrator:
+            try:
+                response = orchestrator.process_command(command)
+            except Exception as e:
+                response = {
+                    "response": f"Erreur traitement commande: {str(e)}",
+                    "agent_used": "error"
+                }
+        else:
+            # Mode démo
+            response = {
+                "response": f"Commande reçue: '{command}' - Mode démo actif. Configurez les agents IA dans config/agents.yaml",
+                "agent_used": "demo"
+            }
+        
+        return jsonify({
+            "command": command,
+            "response": response,
+            "timestamp": datetime.now().isoformat()
+        })
+        
+    except Exception as e:
+        logger.error(f"Erreur commande IA: {e}")
+        return jsonify({"error": str(e)}), 500
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=True,
-        log_level="info"
-    )
+if __name__ == '__main__':
+    # Vérification environnement
+    if not os.path.exists('data/drop_zone'):
+        os.makedirs('data/drop_zone')
+        logger.info("📁 Dossier drop_zone créé")
+        
+    if not os.path.exists('config/agents.yaml'):
+        logger.warning("⚠️  Créez config/agents.yaml depuis agents.example.yaml")
+    
+    # Message démarrage
+    print("\n" + "="*60)
+    print("🚀 PGI-IA Backend API - Démarrage")
+    print("="*60)
+    print(f"📍 URL: http://localhost:5000")
+    print(f"📂 Drop Zone: data/drop_zone/")
+    print(f"🔧 Config: config/agents.yaml")
+    print(f"📋 Mode: {'Production' if orchestrator else 'Démo'}")
+    print("="*60)
+    
+    # Démarrage serveur
+    app.run(debug=True, host='0.0.0.0', port=5000)

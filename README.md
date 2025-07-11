@@ -32,6 +32,30 @@ Ce projet a pour objectif de fournir un système de PGI (Plan de Gestion Interne
 - [ ] Développement du parser PDF.
 - [ ] Intégration dans le hub central.
 
+## Phase 1 – Développement de l'Agent‑Suivi de Directives
+
+1. Préparer un environnement Python :
+   ```bash
+   cd backend
+   python3 -m venv .venv  && source .venv/bin/activate
+   pip install -r requirements.txt
+   cd ..
+   ```
+2. Copier et compléter la config :
+   ```bash
+   cp config/agents.example.yaml config/agents.yaml
+   # Éditez config/agents.yaml pour y placer vos clés API
+   ```
+3. Lancer le parser CLI pour extraire les directives :
+   ```bash
+   scripts/parse_directive.py /chemin/vers/directive.pdf
+   ```
+   → Génère du JSON avec les champs : id, date_recue, description, prix, po_client, statut
+4. Valider la robustesse sur divers formats (CO‑ME, CD, PCE, etc.)
+
+Une fois validé, cochez la case `[ ] Développement du parser PDF.` et intégrez ces sorties dans votre
+pipeline de mise à jour du tableau HTML.
+
 ## ⚙️ Automatisation GitHub
 
 Pour créer automatiquement le repository GitHub (via un token PAT) et pousser l'initial commit :

@@ -1,7 +1,14 @@
 # 🎯 CLAUDE MASTER REFERENCE - Session PGI-IA
-# DERNIÈRE MISE À JOUR: 11 Juillet 2025 - 13:20 (Claude Code WSL)
+# DERNIÈRE MISE À JOUR: 11 Juillet 2025 - 13:40 (Claude Code WSL)
 # Projet: PGI-IA v4.1 - Progiciel de Gestion Intégré avec IA
-# ⚠️ RÈGLE: Toute IA (Claude Code/Claude Desktop) DOIT écrire ici avec date/heure
+# 
+# 🚨 RÈGLES STRICTES NON-NÉGOCIABLES:
+# 0. 🌐 GITHUB FIRST: ./check_github_first.sh OBLIGATOIRE au début
+# 1. VÉRIFIER GitHub: ./verify_file_exists.sh AVANT création
+# 2. ÉCRIRE modifications ICI avec date/heure précise
+# 3. AUCUN fichier "CLAUDE_MASTER" séparé autorisé
+# 4. COMMIT + PUSH immédiat après modifications
+# 5. CONSULTER GITHUB_FIRST_MANDATORY.md pour workflow complet
 
 ## 📊 ÉTAT ACTUEL DU SYSTÈME
 
@@ -22,7 +29,7 @@
 
 ## 📝 JOURNAL DES SESSIONS IA
 
-### 🤖 SESSION Claude Code WSL - 11/07/2025 13:38
+### 🤖 SESSION Claude Code WSL - 11/07/2025 13:50
 **Travail effectué:**
 - ✅ Système d'emails intelligent complet créé
 - ✅ Interface dashboard moderne avec onglet Emails + badge rouge
@@ -56,13 +63,34 @@
 - Interface 3D interactive pour édition chemins canalisations
 - Mobile PWA pour upload photos chantier
 
-**PRIORITÉ 1 (démarrer maintenant):**
-1. Base données SQLite étendue - Foundation everything
-2. Système notes par projet - Usage quotidien  
-3. Upload photos + extraction GPS - Workflow chantier
-4. Pipeline email → CAD basique - Core business
+**NOUVELLE PRIORITÉ 1 - DASHBOARD VISION:**
+1. Design interface utilisateur complète - UX/UI parfaite
+2. Modules fonctionnels intégrés - Workflow chantier réel
+3. Visualisations temps réel - Données projet centralisées  
+4. Navigation intuitive - Efficacité opérationnelle
+
+**DASHBOARD DOIT INCLURE:**
+🏗️ **Sélecteur Projet** (Kahnawake/Alexis-Nihon/+Nouveau)
+📊 **Vue d'ensemble** - KPIs, timeline, statut global
+📝 **Module Notes** - Écrire→IA reformule→Approuver→Sauver
+📸 **Module Photos** - Upload→GPS extract→Plan markers
+📧 **Module Emails** - Tri automatique, actions IA
+🗺️ **Plan Principal** - Markers photos, annotations
+📋 **Directives** - Gestion changements, estimations
+🎙️ **Réunions** - Record→Transcription→Actions
+🏗️ **Vue 3D** - Plans→CAD→3D→Chemins canalisations
 
 - ✅ Vérification unicité CLAUDE_MASTER_REFERENCE.md (1 seul fichier confirmé)
+- ✅ GitHub synchronisé - commit b648a6b - CLAUDE_MASTER_REFERENCE.md unique confirmé
+- ✅ **PARAMÈTRES ANTI-DIVERGENCE CONFIGURÉS** - Règles strictes ajoutées
+- ✅ CLAUDE.md mis sur même longueur d'onde - Règles synchronisées
+- ✅ **PRÊT POUR DÉVELOPPEMENT PRIORITÉ 1** - Commencer Phase Réaliste
+- ✅ **PRIORITÉ 1 COMPLETÉE!** Base données + Notes + Photos GPS systèmes créés
+- 🎯 **CHANGEMENT STRATÉGIE**: Focus dashboard d'abord puis outils backend
+- 🛡️ **SYSTÈME ANTI-DUPLICATION CRÉÉ**: SYSTEM_INVENTORY.md + workflow obligatoire
+- 🌐 **GITHUB FIRST POLICY**: Toujours vérifier GitHub avant création fichier
+- 🛠️ **SCRIPTS GITHUB FIRST**: check_github_first.sh + verify_file_exists.sh créés
+- ⚠️ **13 FICHIERS NON COMMITTÉS**: Backend systems + scripts à pusher
 
 **État système:** Production-ready à 91.5% → Phase réaliste planifiée
 **Fichiers CLAUDE_MASTER dans projet:** 1 seul (✅ règle respectée)
@@ -194,21 +222,72 @@ make up
 
 ---
 
+## 🛡️ WORKFLOW ANTI-DUPLICATION OBLIGATOIRE
+
+### 🚨 GITHUB FIRST - AVANT TOUTE CRÉATION:
+1. **VÉRIFIER GITHUB**: `curl -s https://api.github.com/repos/fvegiard/pgi-ia/contents/[path]`
+2. **OU NAVIGUER**: https://github.com/fvegiard/pgi-ia
+3. **SYNCHRONISER**: `git pull origin main` avant modifications
+4. **LIRE** fichier GitHub si existe avant créer
+
+### COMMANDES GITHUB VÉRIFICATION:
+```bash
+# Vérifier si fichier existe sur GitHub
+curl -s https://api.github.com/repos/fvegiard/pgi-ia/contents/frontend/dashboard.html | grep "name"
+
+# Lister contenu dossier GitHub
+curl -s https://api.github.com/repos/fvegiard/pgi-ia/contents/backend | grep "name"
+
+# Synchroniser avec GitHub
+git pull origin main
+```
+
+### FICHIERS CRITIQUES À NE JAMAIS RECRÉER:
+- dashboard.html/js (38KB/10KB) - EXISTE DÉJÀ ✅
+- Tous systèmes backend (*_system.py) - EXISTENT ✅
+- database_schema_extended.sql - EXISTE ✅
+- CLAUDE_MASTER_REFERENCE.md - CE FICHIER UNIQUE
+
+## 🚨 GARDE-FOUS ANTI-DIVERGENCE
+
+### ❌ ACTIONS INTERDITES
+- Créer fichier "CLAUDE_MASTER_XXX.md" 
+- Créer "MASTER_REFERENCE_XXX.md"
+- Créer "SESSION_MASTER.md" ou similaire
+- Documenter ailleurs que dans CE FICHIER
+- Ignorer les règles de logging
+
+### ✅ ACTIONS OBLIGATOIRES  
+- TOUJOURS lire ce fichier AVANT tout travail
+- TOUJOURS écrire les modifications ICI
+- TOUJOURS mettre date/heure précise
+- VÉRIFIER qu'aucun doublon n'existe
+- POINTER toute IA vers CE FICHIER UNIQUE
+
+### 🔍 VÉRIFICATIONS AUTOMATIQUES
+```bash
+# Commandes à exécuter si doute:
+find . -name "*CLAUDE_MASTER*" -type f
+find . -name "*master*" -iname "*claude*" -type f  
+git ls-files | grep -i "master.*claude\|claude.*master"
+```
+
 ## 🎯 CONTEXTE POUR NOUVEAU CHAT
 
 ### Message d'ouverture recommandé :
 ```
-Je continue le travail sur PGI-IA v4.1. 
-Référence : CLAUDE_MASTER_REFERENCE.md dans /home/fvegi/dev/pgi-ia
+🚨 OBLIGATION: Lire CLAUDE_MASTER_REFERENCE.md dans /home/fvegi/dev/pgi-ia
+Continue le travail sur PGI-IA v4.1. 
 
 État actuel :
-- DeepSeek configuré ✅
-- Gemini prêt mais pas de clé
-- Google Session manager créé
-- Docker architecture prête
-- Backend Flask prêt à démarrer
+- Système 91.5% opérationnel ✅
+- DeepSeek + emails configurés ✅
+- Phase réaliste analysée ✅
+- Backup sécurisé ✅
 
 Prochaine étape : [CE QUE TU VEUX FAIRE]
+
+⚠️ ÉCRIRE TOUTE MODIFICATION DANS CLAUDE_MASTER_REFERENCE.md UNIQUEMENT
 ```
 
 ### Fichiers clés à mentionner :

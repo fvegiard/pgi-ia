@@ -28,14 +28,36 @@ except ImportError:
     print("⚠️ Module email non trouvé")
     email_bp = None
 
+# Import des endpoints notes
+try:
+    from notes_endpoints import notes_bp
+except ImportError:
+    print("⚠️ Module notes non trouvé")
+    notes_bp = None
+
+# Import des endpoints photos
+try:
+    from photo_endpoints import photos_bp
+except ImportError:
+    print("⚠️ Module photos non trouvé")
+    photos_bp = None
+
 # Configuration
 app = Flask(__name__)
 CORS(app)
 
-# Enregistrer le blueprint email si disponible
+# Enregistrer les blueprints si disponibles
 if email_bp:
     app.register_blueprint(email_bp)
     print("✅ Endpoints email enregistrés")
+
+if notes_bp:
+    app.register_blueprint(notes_bp)
+    print("✅ Endpoints notes enregistrés")
+
+if photos_bp:
+    app.register_blueprint(photos_bp)
+    print("✅ Endpoints photos enregistrés")
 
 # Configuration logging
 logging.basicConfig(

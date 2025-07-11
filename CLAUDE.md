@@ -1,10 +1,17 @@
 # Configuration Claude Code pour PGI-IA
 
+# 🚨 RÈGLES STRICTES NON-NÉGOCIABLES:
+# 1. TOUTE IA DOIT LIRE CLAUDE_MASTER_REFERENCE.md AVANT TOUT TRAVAIL
+# 2. TOUTE MODIFICATION DOIT ÊTRE ÉCRITE DANS CLAUDE_MASTER_REFERENCE.md
+# 3. AUCUN FICHIER SÉPARÉ AUTORISÉ POUR DOCUMENTATION MAJEURE
+# 4. DATE/HEURE OBLIGATOIRE sur chaque session
+# 5. VÉRIFIER unicité avant création de fichier similaire
+
 ## 🔗 Guides associés
-- **⚠️ OBLIGATOIRE**: Voir [CLAUDE_MASTER_REFERENCE.md](./CLAUDE_MASTER_REFERENCE.md) - TOUJOURS lire et écrire ici
-- **⚠️ RÈGLES LOGGING**: Voir [CLAUDE_LOGGING_SYSTEM.md](./CLAUDE_LOGGING_SYSTEM.md) - Instructions obligatoires
-- **Claude Desktop**: Voir [CLAUDE_DESKTOP_SETUP.md](./CLAUDE_DESKTOP_SETUP.md) pour utilisation dans Claude Desktop
-- **Mission accomplie**: Voir [MISSION_ACCOMPLIE.md](./MISSION_ACCOMPLIE.md) pour le résumé complet du projet
+- **🚨 OBLIGATOIRE**: [CLAUDE_MASTER_REFERENCE.md](./CLAUDE_MASTER_REFERENCE.md) - FICHIER UNIQUE DE RÉFÉRENCE
+- **🚨 RÈGLES STRICTES**: [CLAUDE_LOGGING_SYSTEM.md](./CLAUDE_LOGGING_SYSTEM.md) - Instructions non-négociables  
+- **Claude Desktop**: [CLAUDE_DESKTOP_SETUP.md](./CLAUDE_DESKTOP_SETUP.md) - Configuration Claude Desktop
+- **Mission accomplie**: [MISSION_ACCOMPLIE.md](./MISSION_ACCOMPLIE.md) - Résumé historique projet
 
 ## Environnement de développement
 - **Projet**: PGI-IA (Progiciel de Gestion Intégré assisté par Intelligence Artificielle)
@@ -119,12 +126,14 @@ export OPENAI_API_KEY=""        # Non trouvée
 export ANTHROPIC_API_KEY=""     # Non trouvée
 ```
 
-## Statut système (11/07/2025)
+## Statut système (11/07/2025 - 13:42)
 - **GPU**: ✅ NVIDIA GeForce RTX 4060 détectée
-- **Mémoire**: ✅ 11.7 GB disponible
-- **Backend Flask**: ⚠️ Prêt mais non démarré
-- **Dépendances**: ✅ 88.9% installées et fonctionnelles
-- **APIs**: DeepSeek OK, autres à configurer
+- **Mémoire**: ✅ 11.7 GB disponible  
+- **Backend Flask**: ✅ Prêt avec endpoints email
+- **Dépendances**: ✅ 91.5% installées et fonctionnelles
+- **APIs**: DeepSeek ✅, OpenAI ✅, autres à configurer
+- **Système**: ✅ Production-ready avec backup sécurisé
+- **Phase**: ✅ Réaliste analysée et planifiée
 
 ## Workflow de développement
 1. Activation environnement
@@ -154,11 +163,25 @@ git commit -m "Ajout Gemini + Google Session + Docker"
 git push origin main  # Nécessite authentification manuelle
 ```
 
+## 🚨 Workflow obligatoire pour toute IA
+1. **LIRE** `CLAUDE_MASTER_REFERENCE.md` (fichier unique de référence)
+2. **VÉRIFIER** qu'aucun doublon n'existe avant créer fichier
+3. **ÉCRIRE** toute modification dans `CLAUDE_MASTER_REFERENCE.md` 
+4. **DATER** chaque session avec heure précise
+5. **RESPECTER** les règles anti-divergence strictes
+
 ## Support et troubleshooting
-- **Master Reference**: `/home/fvegi/dev/pgi-ia/CLAUDE_MASTER_REFERENCE.md`
+- **🚨 RÉFÉRENCE UNIQUE**: `/home/fvegi/dev/pgi-ia/CLAUDE_MASTER_REFERENCE.md`
+- **Règles strictes**: `/home/fvegi/dev/pgi-ia/CLAUDE_LOGGING_SYSTEM.md`
 - **Logs système**: `/home/fvegi/dev/pgi-ia/system_verification.log`
-- **Logs entraînement**: `/home/fvegi/dev/pgi-ia/deepseek_finetune_complete.log`
 - **Rapports d'audit**: `/home/fvegi/dev/pgi-ia/system_verification_report.json`
 
+## 🔍 Commandes vérification unicité
+```bash
+find . -name "*CLAUDE_MASTER*" -type f
+find . -name "*master*" -iname "*claude*" -type f
+git ls-files | grep -i "master.*claude\|claude.*master"
+```
+
 ---
-*Configuration mise à jour le 11/07/2025 - Session ajout Gemini/Google/Docker*
+*Configuration mise à jour le 11/07/2025 13:42 - Règles anti-divergence renforcées*

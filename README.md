@@ -35,7 +35,12 @@ Ce projet a pour objectif de fournir un système de PGI (Plan de Gestion Interne
 ## ⚙️ Automatisation GitHub
 
 Pour créer automatiquement le repository GitHub (via un token PAT) et pousser l'initial commit :
+
 ```bash
-export GITHUB_TOKEN=ghp_xxx
+# (Optionnel) Personnalisation :
+# export ORG="<organisation_ou_utilisateur>"   # défaut = $(git config user.name)
+# export REPO="<nom_du_repo>"                # défaut = pgi-ia
+#
+export GITHUB_TOKEN=ghp_xxxTON_TOKEN_ICI
 bash scripts/create_github_repo.sh
 ```

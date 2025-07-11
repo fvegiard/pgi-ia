@@ -11,10 +11,13 @@ if [ -z "${GITHUB_TOKEN:-}" ]; then
 fi
 
 # Lecture des paramètres utilisateur/organisation et nom du repo
-read -r -p "Utilisateur ou organisation GitHub (default: $(git config user.name)): " ORG
+# Organisation/utilisateur GitHub (default: git config user.name)
 ORG=${ORG:-$(git config user.name)}
-read -r -p "Nom du repository (default: pgi-ia): " REPO
+# Nom du repository (default: pgi-ia)
 REPO=${REPO:-pgi-ia}
+
+echo "→ Organisation/utilisateur : $ORG"
+echo "→ Repository           : $REPO"
 
 # Création via API GitHub (orga puis user)
 echo "Création du repository ${ORG}/${REPO} sur GitHub..."

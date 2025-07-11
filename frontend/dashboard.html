@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PGI-IA - Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar-transition { transition: width 0.3s ease; }
+        .badge { 
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 20px;
+            height: 20px;
+            padding: 0 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: white;
+            background-color: #EF4444;
+            border-radius: 10px;
+            margin-left: auto;
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            color: #9CA3AF;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+            background: none;
+            text-align: left;
+        }
+        .sidebar-item:hover {
+            background-color: rgba(55, 65, 81, 0.5);
+            color: white;
+        }
+        .sidebar-item.active {
+            background-color: #3B82F6;
+            color: white;
+        }
+        .sidebar-item svg {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+        .sidebar-collapsed .sidebar-item svg {
+            margin-right: 0;
+        }
+        .sidebar-collapsed .sidebar-item span {
+            display: none;
+        }
+        .sidebar-collapsed .badge {
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform: translate(50%, -50%);
+        }
+        .email-item {
+            transition: all 0.2s;
+        }
+        .email-item:hover {
+            transform: translateX(4px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .email-priority-high {
+            border-left: 4px solid #EF4444;
+        }
+        .email-priority-normal {
+            border-left: 4px solid #3B82F6;
+        }
+        .email-priority-low {
+            border-left: 4px solid #6B7280;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <div id="sidebar" class="bg-gray-900 text-white sidebar-transition" style="width: 256px;">
+            <div class="p-4 h-full flex flex-col">
+                <div class="flex items-center justify-between mb-8">
+                    <h1 id="logo" class="text-2xl font-bold">PGI-IA</h1>
+                    <button id="toggleSidebar" class="text-white hover:bg-gray-800 p-2 rounded">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <nav class="space-y-2 flex-1">
+                    <button class="sidebar-item active" data-tab="dashboard">
+                        <i data-lucide="bar-chart-3"></i>
+                        <span>Tableau de bord</span>
+                    </button>
+                    <button class="sidebar-item" data-tab="projects">
+                        <i data-lucide="file-text"></i>
+                        <span>Projets</span>
+                    </button>
+                    <button class="sidebar-item" data-tab="documents">
+                        <i data-lucide="file-search"></i>
+                        <span>Documents</span>
+                    </button>
+                    <button class="sidebar-item" data-tab="ai">
+                        <i data-lucide="brain"></i>
+                        <span>Analyses IA</span>
+                    </button>
+                    <button class="sidebar-item" data-tab="estimations">
+                        <i data-lucide="dollar-sign"></i>
+                        <span>Estimations</span>
+                    </button>
+                    <button class="sidebar-item relative" data-tab="emails">
+                        <i data-lucide="mail"></i>
+                        <span>Emails</span>
+                        <span class="badge" id="emailBadge">3</span>
+                    </button>
+                    <button class="sidebar-item" data-tab="settings">
+                        <i data-lucide="settings"></i>
+                        <span>Configuration</span>
+                    </button>
+                </nav>
+
+                <div class="pt-4 border-t border-gray-700">
+                    <button class="sidebar-item w-full">
+                        <i data-lucide="log-out"></i>
+                        <span>Déconnexion</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="flex-1 overflow-auto">
+            <div class="p-8">
+                <!-- Dashboard Tab -->
+                <div id="dashboard" class="tab-content active">
+                    <h2 class="text-2xl font-bold mb-6">Tableau de bord</h2>
+                    
+                    <!-- Stats Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 rounded-lg bg-blue-100 text-blue-600">
+                                    <i data-lucide="file-text" class="w-6 h-6"></i>
+                                </div>
+                                <span class="text-sm font-medium text-green-600">+12%</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900">47</h3>
+                            <p class="text-sm text-gray-600 mt-1">Projets actifs</p>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 rounded-lg bg-green-100 text-green-600">
+                                    <i data-lucide="dollar-sign" class="w-6 h-6"></i>
+                                </div>
+                                <span class="text-sm font-medium text-green-600">+8%</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900">12</h3>
+                            <p class="text-sm text-gray-600 mt-1">Estimations</p>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 rounded-lg bg-purple-100 text-purple-600">
+                                    <i data-lucide="file-search" class="w-6 h-6"></i>
+                                </div>
+                                <span class="text-sm font-medium text-green-600">+24%</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900">324</h3>
+                            <p class="text-sm text-gray-600 mt-1">Documents</p>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 rounded-lg bg-orange-100 text-orange-600">
+                                    <i data-lucide="brain" class="w-6 h-6"></i>
+                                </div>
+                                <span class="text-sm font-medium text-green-600">+18%</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900">1247</h3>
+                            <p class="text-sm text-gray-600 mt-1">Analyses IA</p>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 rounded-lg bg-green-100 text-green-600">
+                                    <i data-lucide="trending-up" class="w-6 h-6"></i>
+                                </div>
+                                <span class="text-sm font-medium text-green-600">+15%</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900">72,000$</h3>
+                            <p class="text-sm text-gray-600 mt-1">CA mensuel</p>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <div class="p-3 rounded-lg bg-blue-100 text-blue-600">
+                                    <i data-lucide="zap" class="w-6 h-6"></i>
+                                </div>
+                                <span class="text-sm font-medium text-green-600">+2%</span>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900">94.5%</h3>
+                            <p class="text-sm text-gray-600 mt-1">Précision IA</p>
+                        </div>
+                    </div>
+
+                    <!-- Charts -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-semibold mb-4">Revenus mensuels</h3>
+                            <canvas id="revenueChart"></canvas>
+                        </div>
+                        
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-lg font-semibold mb-4">Répartition des projets</h3>
+                            <canvas id="projectChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Recent Projects Table -->
+                    <div class="bg-white rounded-lg shadow">
+                        <div class="p-6 border-b">
+                            <h3 class="text-lg font-semibold">Projets récents</h3>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">ID</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Client</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Progression</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Valeur</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-200">
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">S-1086</td>
+                                        <td class="px-6 py-4 text-sm text-gray-900">Musée Kahnawake</td>
+                                        <td class="px-6 py-4 text-sm text-gray-500">Ville de Kahnawake</td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center">
+                                                <div class="w-32 bg-gray-200 rounded-full h-2 mr-2">
+                                                    <div class="bg-blue-600 h-2 rounded-full" style="width: 75%"></div>
+                                                </div>
+                                                <span class="text-sm text-gray-600">75%</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-900">$450,000</td>
+                                        <td class="px-6 py-4 text-sm">
+                                            <div class="flex space-x-2">
+                                                <button class="text-blue-600 hover:text-blue-800">
+                                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                                </button>
+                                                <button class="text-green-600 hover:text-green-800">
+                                                    <i data-lucide="edit" class="w-4 h-4"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900">C-24-048</td>
+                                        <td class="px-6 py-4 text-sm text-gray-900">Place Alexis-Nihon</td>
+                                        <td class="px-6 py-4 text-sm text-gray-500">Cominar REIT</td>
+                                        <td class="px-6 py-4">
+                                            <div class="flex items-center">
+                                                <div class="w-32 bg-gray-200 rounded-full h-2 mr-2">
+                                                    <div class="bg-blue-600 h-2 rounded-full" style="width: 45%"></div>
+                                                </div>
+                                                <span class="text-sm text-gray-600">45%</span>
+                                            </div>
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-900">$680,000</td>
+                                        <td class="px-6 py-4 text-sm">
+                                            <div class="flex space-x-2">
+                                                <button class="text-blue-600 hover:text-blue-800">
+                                                    <i data-lucide="eye" class="w-4 h-4"></i>
+                                                </button>
+                                                <button class="text-green-600 hover:text-green-800">
+                                                    <i data-lucide="edit" class="w-4 h-4"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Emails Tab -->
+                <div id="emails" class="tab-content">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-2xl font-bold">Emails</h2>
+                        <div class="flex space-x-4">
+                            <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center space-x-2">
+                                <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                                <span>Synchroniser</span>
+                            </button>
+                            <button class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center space-x-2">
+                                <i data-lucide="mail" class="w-5 h-5"></i>
+                                <span>Composer</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Email Filters -->
+                    <div class="bg-white rounded-lg shadow p-4 mb-6">
+                        <div class="flex items-center space-x-4">
+                            <div class="flex-1">
+                                <div class="relative">
+                                    <i data-lucide="search" class="absolute left-3 top-3 text-gray-400 w-5 h-5"></i>
+                                    <input type="text" placeholder="Rechercher dans les emails..." 
+                                           class="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+                                </div>
+                            </div>
+                            <select class="border rounded-lg px-4 py-2">
+                                <option>Tous les emails</option>
+                                <option>Non lus</option>
+                                <option>Directives</option>
+                                <option>Plans</option>
+                                <option>Changements</option>
+                                <option>Questions</option>
+                            </select>
+                            <select class="border rounded-lg px-4 py-2">
+                                <option>Tous les projets</option>
+                                <option>S-1086 - Kahnawake</option>
+                                <option>C-24-048 - Alexis-Nihon</option>
+                            </select>
+                            <button class="border rounded-lg px-4 py-2 hover:bg-gray-50">
+                                <i data-lucide="filter" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Email Stats -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div class="bg-white rounded-lg shadow p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-600">Total emails</p>
+                                    <p class="text-2xl font-bold">127</p>
+                                </div>
+                                <div class="p-3 bg-blue-100 rounded-lg">
+                                    <i data-lucide="mail" class="w-6 h-6 text-blue-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-600">Non lus</p>
+                                    <p class="text-2xl font-bold text-red-600">3</p>
+                                </div>
+                                <div class="p-3 bg-red-100 rounded-lg">
+                                    <i data-lucide="mail-open" class="w-6 h-6 text-red-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-600">Traités aujourd'hui</p>
+                                    <p class="text-2xl font-bold text-green-600">12</p>
+                                </div>
+                                <div class="p-3 bg-green-100 rounded-lg">
+                                    <i data-lucide="check-circle" class="w-6 h-6 text-green-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-4">
+                            <div class="flex items-center justify-between">
+                                <div>
+                                    <p class="text-sm text-gray-600">En attente</p>
+                                    <p class="text-2xl font-bold text-orange-600">5</p>
+                                </div>
+                                <div class="p-3 bg-orange-100 rounded-lg">
+                                    <i data-lucide="clock" class="w-6 h-6 text-orange-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Email List -->
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Email List Column -->
+                        <div class="lg:col-span-2">
+                            <div class="bg-white rounded-lg shadow">
+                                <div class="p-4 border-b">
+                                    <h3 class="font-semibold">Boîte de réception</h3>
+                                </div>
+                                <div class="divide-y">
+                                    <!-- Email Item 1 - Non lu -->
+                                    <div class="p-4 hover:bg-gray-50 cursor-pointer email-item email-priority-high">
+                                        <div class="flex items-start space-x-3">
+                                            <input type="checkbox" class="mt-1">
+                                            <div class="flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="font-semibold text-gray-900">Architecte XYZ</span>
+                                                        <span class="bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded">Non lu</span>
+                                                        <span class="bg-purple-100 text-purple-800 text-xs px-2 py-0.5 rounded">Directive</span>
+                                                    </div>
+                                                    <span class="text-sm text-gray-500">Il y a 5 min</span>
+                                                </div>
+                                                <h4 class="font-medium mt-1">⚡ Directive CD-203 - Modification urgente éclairage</h4>
+                                                <p class="text-sm text-gray-600 mt-1">Bonjour, Suite à notre réunion de ce matin, voici la directive pour modifier le système d'éclairage du hall principal...</p>
+                                                <div class="flex items-center space-x-4 mt-2 text-sm">
+                                                    <span class="text-gray-500">Projet: S-1086</span>
+                                                    <span class="text-orange-600 font-medium">Priorité haute</span>
+                                                    <button class="text-blue-600 hover:underline">Traiter automatiquement</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Email Item 2 - Non lu -->
+                                    <div class="p-4 hover:bg-gray-50 cursor-pointer email-item email-priority-normal">
+                                        <div class="flex items-start space-x-3">
+                                            <input type="checkbox" class="mt-1">
+                                            <div class="flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="font-semibold text-gray-900">Ingénieur ABC</span>
+                                                        <span class="bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded">Non lu</span>
+                                                        <span class="bg-blue-100 text-blue-800 text-xs px-2 py-0.5 rounded">Plan</span>
+                                                    </div>
+                                                    <span class="text-sm text-gray-500">Il y a 23 min</span>
+                                                </div>
+                                                <h4 class="font-medium mt-1">📐 Rev.3 Plan E-101 - Distribution électrique</h4>
+                                                <p class="text-sm text-gray-600 mt-1">Veuillez trouver en pièce jointe la révision 3 du plan de distribution électrique E-101 avec les modifications demandées...</p>
+                                                <div class="flex items-center space-x-4 mt-2 text-sm">
+                                                    <span class="text-gray-500">Projet: C-24-048</span>
+                                                    <span class="flex items-center text-gray-600">
+                                                        <i data-lucide="paperclip" class="w-4 h-4 mr-1"></i>
+                                                        2 fichiers
+                                                    </span>
+                                                    <button class="text-blue-600 hover:underline">Analyser avec IA</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Email Item 3 - Non lu -->
+                                    <div class="p-4 hover:bg-gray-50 cursor-pointer email-item email-priority-normal">
+                                        <div class="flex items-start space-x-3">
+                                            <input type="checkbox" class="mt-1">
+                                            <div class="flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="font-semibold text-gray-900">Client Kahnawake</span>
+                                                        <span class="bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded">Non lu</span>
+                                                        <span class="bg-yellow-100 text-yellow-800 text-xs px-2 py-0.5 rounded">Question</span>
+                                                    </div>
+                                                    <span class="text-sm text-gray-500">Il y a 45 min</span>
+                                                </div>
+                                                <h4 class="font-medium mt-1">❓ Question sur l'estimation des coûts supplémentaires</h4>
+                                                <p class="text-sm text-gray-600 mt-1">Pouvez-vous clarifier les coûts additionnels mentionnés dans votre dernière estimation? Particulièrement pour...</p>
+                                                <div class="flex items-center space-x-4 mt-2 text-sm">
+                                                    <span class="text-gray-500">Projet: S-1086</span>
+                                                    <button class="text-blue-600 hover:underline">Suggérer réponse</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Email Item 4 - Lu -->
+                                    <div class="p-4 hover:bg-gray-50 cursor-pointer email-item email-priority-low opacity-75">
+                                        <div class="flex items-start space-x-3">
+                                            <input type="checkbox" class="mt-1">
+                                            <div class="flex-1">
+                                                <div class="flex items-center justify-between">
+                                                    <div class="flex items-center space-x-2">
+                                                        <span class="text-gray-700">Fournisseur DEF</span>
+                                                        <span class="bg-green-100 text-green-800 text-xs px-2 py-0.5 rounded">Traité</span>
+                                                    </div>
+                                                    <span class="text-sm text-gray-500">Hier</span>
+                                                </div>
+                                                <h4 class="text-gray-700 mt-1">Confirmation de livraison - Matériel électrique</h4>
+                                                <p class="text-sm text-gray-500 mt-1">La livraison du matériel électrique commandé est confirmée pour le 15 juillet 2025...</p>
+                                                <div class="flex items-center space-x-4 mt-2 text-sm">
+                                                    <span class="text-gray-500">Projet: C-24-048</span>
+                                                    <span class="text-green-600">✓ Auto-classé</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Email Actions & AI Panel -->
+                        <div class="space-y-6">
+                            <!-- Actions rapides -->
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <h3 class="font-semibold mb-4">Actions rapides</h3>
+                                <div class="space-y-3">
+                                    <button class="w-full text-left p-3 border rounded-lg hover:bg-gray-50 flex items-center justify-between">
+                                        <div class="flex items-center space-x-3">
+                                            <i data-lucide="file-plus" class="w-5 h-5 text-blue-600"></i>
+                                            <span>Créer directive</span>
+                                        </div>
+                                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
+                                    </button>
+                                    <button class="w-full text-left p-3 border rounded-lg hover:bg-gray-50 flex items-center justify-between">
+                                        <div class="flex items-center space-x-3">
+                                            <i data-lucide="calculator" class="w-5 h-5 text-green-600"></i>
+                                            <span>Calculer impact</span>
+                                        </div>
+                                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
+                                    </button>
+                                    <button class="w-full text-left p-3 border rounded-lg hover:bg-gray-50 flex items-center justify-between">
+                                        <div class="flex items-center space-x-3">
+                                            <i data-lucide="reply" class="w-5 h-5 text-purple-600"></i>
+                                            <span>Réponse auto</span>
+                                        </div>
+                                        <i data-lucide="chevron-right" class="w-4 h-4 text-gray-400"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Classification IA -->
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <h3 class="font-semibold mb-4">Classification IA</h3>
+                                <div class="space-y-4">
+                                    <div>
+                                        <div class="flex justify-between items-center mb-2">
+                                            <span class="text-sm text-gray-600">Précision classification</span>
+                                            <span class="text-sm font-medium">95%</span>
+                                        </div>
+                                        <div class="w-full bg-gray-200 rounded-full h-2">
+                                            <div class="bg-green-600 h-2 rounded-full" style="width: 95%"></div>
+                                        </div>
+                                    </div>
+                                    <div class="text-sm space-y-2">
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Emails classés</span>
+                                            <span class="font-medium">124/127</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Actions auto</span>
+                                            <span class="font-medium">89</span>
+                                        </div>
+                                        <div class="flex justify-between">
+                                            <span class="text-gray-600">Temps économisé</span>
+                                            <span class="font-medium">4.2h/sem</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Règles actives -->
+                            <div class="bg-white rounded-lg shadow p-6">
+                                <h3 class="font-semibold mb-4">Règles actives</h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between p-2 bg-green-50 rounded">
+                                        <span class="text-sm">Auto-créer directives</span>
+                                        <input type="checkbox" checked class="toggle">
+                                    </div>
+                                    <div class="flex items-center justify-between p-2 bg-blue-50 rounded">
+                                        <span class="text-sm">Analyser plans PDF</span>
+                                        <input type="checkbox" checked class="toggle">
+                                    </div>
+                                    <div class="flex items-center justify-between p-2 bg-purple-50 rounded">
+                                        <span class="text-sm">Réponses suggérées</span>
+                                        <input type="checkbox" checked class="toggle">
+                                    </div>
+                                    <div class="flex items-center justify-between p-2 bg-gray-50 rounded">
+                                        <span class="text-sm">Notifications urgentes</span>
+                                        <input type="checkbox" class="toggle">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Other tabs remain unchanged -->
+                <div id="projects" class="tab-content">
+                    <h2 class="text-2xl font-bold mb-6">Projets</h2>
+                    <!-- Projects content -->
+                </div>
+
+                <div id="documents" class="tab-content">
+                    <h2 class="text-2xl font-bold mb-6">Documents</h2>
+                    <!-- Documents content -->
+                </div>
+
+                <div id="ai" class="tab-content">
+                    <h2 class="text-2xl font-bold mb-6">Analyses IA</h2>
+                    <!-- AI content -->
+                </div>
+
+                <div id="estimations" class="tab-content">
+                    <h2 class="text-2xl font-bold mb-6">Estimations</h2>
+                    <!-- Estimations content -->
+                </div>
+
+                <div id="settings" class="tab-content">
+                    <h2 class="text-2xl font-bold mb-6">Configuration</h2>
+                    <!-- Settings content -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

@@ -21,9 +21,21 @@ except ImportError:
     DirectiveAgent = None
     AgentOrchestrator = None
 
+# Import des endpoints email
+try:
+    from backend.email_endpoints import email_bp
+except ImportError:
+    print("⚠️ Module email non trouvé")
+    email_bp = None
+
 # Configuration
 app = Flask(__name__)
 CORS(app)
+
+# Enregistrer le blueprint email si disponible
+if email_bp:
+    app.register_blueprint(email_bp)
+    print("✅ Endpoints email enregistrés")
 
 # Configuration logging
 logging.basicConfig(

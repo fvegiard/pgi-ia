@@ -1,6 +1,7 @@
 # 🎯 CLAUDE MASTER REFERENCE - Session PGI-IA
-# Date: 11 Juillet 2025
+# DERNIÈRE MISE À JOUR: 11 Juillet 2025 - 13:20 (Claude Code WSL)
 # Projet: PGI-IA v4.1 - Progiciel de Gestion Intégré avec IA
+# ⚠️ RÈGLE: Toute IA (Claude Code/Claude Desktop) DOIT écrire ici avec date/heure
 
 ## 📊 ÉTAT ACTUEL DU SYSTÈME
 
@@ -19,7 +20,40 @@
 
 ---
 
-## 🛠️ TRAVAIL EFFECTUÉ CETTE SESSION
+## 📝 JOURNAL DES SESSIONS IA
+
+### 🤖 SESSION Claude Code WSL - 11/07/2025 13:20
+**Travail effectué:**
+- ✅ Système d'emails intelligent complet créé
+- ✅ Interface dashboard moderne avec onglet Emails + badge rouge
+- ✅ DeepSeek email classifier spécialisé électrique  
+- ✅ Endpoints API: /api/emails, /api/emails/unread, etc.
+- ✅ Correction bug graphiques Chart.js (resize infini)
+- ✅ Backup complet système + documentation continuité
+- ✅ Tests intégrité 91.5% - Système opérationnel
+- ✅ Git synchronisé, commit d107504 pushé
+
+**Fichiers créés/modifiés:**
+- backend/email_classifier_deepseek.py
+- backend/email_endpoints.py  
+- DEEPSEEK_EMAIL_INTEGRATION.md
+- FIX_CHARTS_RESIZE.md
+- ETAT_SYSTEM_PARFAIT_CONTINUITE.md
+- dashboard.html, dashboard.js (correction charts)
+
+**État système:** Production-ready à 91.5%
+
+### 🖥️ SESSION Claude Desktop - [DATE À COMPLÉTER]
+**Travail effectué par Claude Desktop:**
+- [À DOCUMENTER lors prochaine utilisation Claude Desktop]
+
+### 🖥️ SESSION Claude Desktop - [DATE À COMPLÉTER] 
+**Travail effectué par Claude Desktop:**
+- [À DOCUMENTER lors prochaine utilisation Claude Desktop]
+
+---
+
+## 🛠️ TRAVAIL EFFECTUÉ SESSIONS PRÉCÉDENTES
 
 ### 1. 🔍 Recherche des clés API
 ```bash

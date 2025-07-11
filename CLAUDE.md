@@ -1,9 +1,10 @@
 # Configuration Claude Code pour PGI-IA
 
 ## 🔗 Guides associés
+- **⚠️ OBLIGATOIRE**: Voir [CLAUDE_MASTER_REFERENCE.md](./CLAUDE_MASTER_REFERENCE.md) - TOUJOURS lire et écrire ici
+- **⚠️ RÈGLES LOGGING**: Voir [CLAUDE_LOGGING_SYSTEM.md](./CLAUDE_LOGGING_SYSTEM.md) - Instructions obligatoires
 - **Claude Desktop**: Voir [CLAUDE_DESKTOP_SETUP.md](./CLAUDE_DESKTOP_SETUP.md) pour utilisation dans Claude Desktop
 - **Mission accomplie**: Voir [MISSION_ACCOMPLIE.md](./MISSION_ACCOMPLIE.md) pour le résumé complet du projet
-- **Session Master**: Voir [CLAUDE_MASTER_REFERENCE.md](./CLAUDE_MASTER_REFERENCE.md) pour l'état actuel complet
 
 ## Environnement de développement
 - **Projet**: PGI-IA (Progiciel de Gestion Intégré assisté par Intelligence Artificielle)

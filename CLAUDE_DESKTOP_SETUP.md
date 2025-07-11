@@ -1,5 +1,10 @@
 # 🔧 Configuration Claude Desktop pour PGI-IA
 
+⚠️ **OBLIGATION AVANT TOUT TRAVAIL**: 
+1. Lire [CLAUDE_MASTER_REFERENCE.md](./CLAUDE_MASTER_REFERENCE.md) 
+2. Suivre [CLAUDE_LOGGING_SYSTEM.md](./CLAUDE_LOGGING_SYSTEM.md)
+3. Écrire dans le journal avec date/heure
+
 ## Installation rapide dans Claude Desktop
 
 ### 1. Cloner le projet

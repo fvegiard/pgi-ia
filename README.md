@@ -5,6 +5,12 @@
 [![React](https://img.shields.io/badge/React-18.2+-61DAFB.svg)](https://reactjs.org)
 [![Status](https://img.shields.io/badge/Status-Production%20Ready-success.svg)]()
 
+## ⚠️ LECTURE OBLIGATOIRE POUR TOUTE IA
+**AVANT TOUT TRAVAIL, toute IA doit:**
+1. **Lire** [CLAUDE_MASTER_REFERENCE.md](./CLAUDE_MASTER_REFERENCE.md) 
+2. **Suivre** [CLAUDE_LOGGING_SYSTEM.md](./CLAUDE_LOGGING_SYSTEM.md)
+3. **Écrire** dans le journal avec date/heure
+
 ## 🎯 Description
 
 PGI-IA est un système complet de gestion électrique industrielle assisté par IA, spécialisé dans:

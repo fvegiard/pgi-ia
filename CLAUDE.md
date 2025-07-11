@@ -39,6 +39,20 @@
 - `Makefile` - Commandes simplifiées
 - `docker/` - Dockerfiles pour chaque service
 
+### 📧 Système Email Intelligent (NOUVEAU)
+- **Architecture complète**: Voir [EMAIL_SYSTEM_ARCHITECTURE.md](./EMAIL_SYSTEM_ARCHITECTURE.md)
+- **Flux**: Outlook → PGI-IA → Tri automatique par projet → Actions IA
+- **Components**:
+  - `email_watcher_service.py` - Service capture emails Outlook
+  - `backend/email_processor.py` - Traitement et classification
+  - `backend/email_classifier_ai.py` - IA tri automatique
+  - Interface emails dans dashboard v2
+- **Features**:
+  - Détection automatique directives/plans/changements
+  - Classification par projet (Kahnawake/Alexis-Nihon)
+  - Actions automatiques selon le type
+  - Timeline temps réel des emails
+
 ## Commandes fréquentes
 
 ### Activation environnement

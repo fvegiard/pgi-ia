@@ -31,3 +31,11 @@ Ce projet a pour objectif de fournir un système de PGI (Plan de Gestion Interne
 - [x] Initialisation et structure du projet.
 - [ ] Développement du parser PDF.
 - [ ] Intégration dans le hub central.
+
+## ⚙️ Automatisation GitHub
+
+Pour créer automatiquement le repository GitHub (via un token PAT) et pousser l'initial commit :
+```bash
+export GITHUB_TOKEN=ghp_xxx
+bash scripts/create_github_repo.sh
+```

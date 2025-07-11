@@ -1,18 +1,23 @@
 # 🔧 Configuration Claude Desktop pour PGI-IA
 
 ⚠️ **OBLIGATION AVANT TOUT TRAVAIL**: 
-1. Lire [CLAUDE_MASTER_REFERENCE.md](./CLAUDE_MASTER_REFERENCE.md) 
-2. Suivre [CLAUDE_LOGGING_SYSTEM.md](./CLAUDE_LOGGING_SYSTEM.md)
-3. Écrire dans le journal avec date/heure
+1. 🌐 **GITHUB FIRST**: Exécuter `./check_github_first.sh`
+2. Lire [CLAUDE_MASTER_REFERENCE.md](./CLAUDE_MASTER_REFERENCE.md) 
+3. Suivre [GITHUB_FIRST_MANDATORY.md](./GITHUB_FIRST_MANDATORY.md)
+4. Vérifier fichiers: `./verify_file_exists.sh [path]`
+5. Écrire dans journal avec date/heure
 
 ## Installation rapide dans Claude Desktop
 
-### 1. Cloner le projet
+### 1. Cloner et synchroniser avec GitHub
 ```bash
-# Dans Claude Desktop, exécutez :
+# Dans Claude Desktop, TOUJOURS commencer par :
 cd /mnt/c/Users/fvegi/dev
-git clone https://github.com/fvegiard/pgi-ia.git
+git clone https://github.com/fvegiard/pgi-ia.git  # Si pas déjà fait
 cd pgi-ia
+
+# 🚨 OBLIGATOIRE À CHAQUE SESSION
+./check_github_first.sh
 ```
 
 ### 2. Créer l'environnement Python
@@ -82,14 +87,28 @@ C:\Users\fvegi\dev\pgi-ia\
 └── *.py                  # Scripts d'entraînement
 ```
 
-## 🔄 Workflow Claude Desktop
+## 🔄 Workflow Claude Desktop - GITHUB FIRST
+
+### 🚨 AVANT TOUTE MODIFICATION
+
+```bash
+# 1. TOUJOURS synchroniser d'abord
+./check_github_first.sh
+
+# 2. AVANT de créer un fichier
+./verify_file_exists.sh frontend/dashboard.html
+# Si existe → NE PAS recréer, utiliser Read/Edit
+
+# 3. Consulter inventaire
+cat SYSTEM_INVENTORY.md
+```
 
 ### Pour les modifications
 
-1. **Faire les changements dans Claude Desktop**
+1. **Vérifier GitHub d'abord**
 ```bash
-# Éditer les fichiers
-# Tester localement
+# Vérifier si fichier existe sur GitHub
+./verify_file_exists.sh [path/to/file]
 ```
 
 2. **Commit et push**
@@ -173,15 +192,23 @@ Cela lance :
    - Toujours pull avant de commencer
    - Push après chaque session
 
-## 🚀 Commande rapide tout-en-un
+## 🚀 Commande rapide tout-en-un GITHUB FIRST
 
 ```bash
-# Dans Claude Desktop
+# Dans Claude Desktop - TOUJOURS commencer par ça
 cd /mnt/c/Users/fvegi/dev/pgi-ia && \
-git pull origin main && \
+./check_github_first.sh && \
 source venv_pgi_ia/bin/activate && \
 python start_all_services.py
 ```
+
+## ⚠️ RÈGLES GITHUB FIRST POUR CLAUDE DESKTOP
+
+1. **JAMAIS** créer de fichier sans `./verify_file_exists.sh`
+2. **TOUJOURS** faire `./check_github_first.sh` au début
+3. **LIRE** [GITHUB_FIRST_MANDATORY.md](./GITHUB_FIRST_MANDATORY.md)
+4. **CONSULTER** [SYSTEM_INVENTORY.md](./SYSTEM_INVENTORY.md)
+5. **ÉCRIRE** dans [CLAUDE_MASTER_REFERENCE.md](./CLAUDE_MASTER_REFERENCE.md)
 
 ---
 *Ce guide est spécifique à Claude Desktop pour le projet PGI-IA*

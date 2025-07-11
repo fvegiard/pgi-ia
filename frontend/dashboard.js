@@ -1,4 +1,10 @@
 // PGI-IA Dashboard JavaScript
+
+// Import real data
+const script = document.createElement('script');
+script.src = 'dashboard_real_data.js';
+document.head.appendChild(script);
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize Lucide icons
     lucide.createIcons();
@@ -7,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let sidebarOpen = true;
     let unreadEmailCount = 3;
     let activeTab = 'dashboard';
+    let currentProject = 'S-1086';  // Default to Kahnawake
 
     // Sidebar toggle
     const sidebar = document.getElementById('sidebar');
@@ -50,9 +57,24 @@ document.addEventListener('DOMContentLoaded', function() {
             // Update page content if needed
             if (tabName === 'emails') {
                 updateEmailBadge();
+            } else if (tabName === 'directives') {
+                loadDirectives();
+            } else if (tabName === 'notes') {
+                loadNotes();
+            } else if (tabName === 'photos') {
+                loadPhotos();
             }
         });
     });
+    
+    // Project selector
+    const projectSelector = document.getElementById('projectSelector');
+    if (projectSelector) {
+        projectSelector.addEventListener('change', function() {
+            currentProject = this.value;
+            updateProjectData();
+        });
+    }
 
     // Update email badge
     function updateEmailBadge() {
@@ -248,11 +270,145 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 30000); // Every 30 seconds
     }
 
+    // Load directives data
+    function loadDirectives() {
+        const tbody = document.getElementById('directivesTableBody');
+        if (!tbody || !window.REAL_PROJECT_DATA) return;
+        
+        const directives = currentProject === 'S-1086' ? 
+            window.REAL_PROJECT_DATA.kahnawakeDirectives : 
+            window.REAL_PROJECT_DATA.alexisNihonDirectives || [];
+        
+        tbody.innerHTML = '';
+        
+        directives.slice(0, 10).forEach(dir => {
+            const statusClass = getStatusClass(dir.status);
+            const priceFormatted = dir.price !== 0 ? 
+                new Intl.NumberFormat('fr-CA', { style: 'currency', currency: 'CAD' }).format(dir.price) : 
+                '-';
+            
+            const row = `
+                <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${dir.id}</td>
+                    <td class="px-6 py-4 text-sm text-gray-700">${dir.desc}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${dir.dateRecue || '-'}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-mono ${dir.price < 0 ? 'text-red-600' : 'text-gray-900'}">${priceFormatted}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="${statusClass}">${dir.status}</span>
+                    </td>
+                </tr>
+            `;
+            tbody.innerHTML += row;
+        });
+    }
+    
+    function getStatusClass(status) {
+        const classes = {
+            'À préparer': 'px-2 py-1 text-xs font-medium rounded-full bg-yellow-100 text-yellow-800',
+            'À clarifier': 'px-2 py-1 text-xs font-medium rounded-full bg-red-100 text-red-800',
+            'Soumis': 'px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800',
+            'Sans Frais': 'px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800',
+            'Approuvé': 'px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800'
+        };
+        return classes[status] || '';
+    }
+    
+    // Load notes data
+    function loadNotes() {
+        const notesList = document.getElementById('notesList');
+        if (!notesList || !window.REAL_PROJECT_DATA) return;
+        
+        // Notes are already in the HTML, but we could dynamically update them here
+        const notesCount = document.getElementById('notesBadge');
+        if (notesCount) {
+            notesCount.textContent = window.REAL_PROJECT_DATA.recentNotes.length;
+        }
+    }
+    
+    // Load photos data
+    function loadPhotos() {
+        // Photos functionality would connect to backend
+        console.log('Loading photos for project:', currentProject);
+    }
+    
+    // Update project data when changed
+    function updateProjectData() {
+        if (!window.REAL_PROJECT_DATA) return;
+        
+        const project = window.REAL_PROJECT_DATA.projects.find(p => p.id === currentProject);
+        if (!project) return;
+        
+        // Update stats if on dashboard
+        if (activeTab === 'dashboard') {
+            updateDashboardStats();
+        }
+        
+        // Update directives if on directives tab
+        if (activeTab === 'directives') {
+            loadDirectives();
+            updateDirectivesStats(project);
+        }
+    }
+    
+    // Update dashboard statistics with real data
+    function updateDashboardStats() {
+        if (!window.REAL_PROJECT_DATA) return;
+        
+        // Update counters
+        document.getElementById('activeProjectsCount').textContent = window.REAL_PROJECT_DATA.stats.activeProjects;
+        document.getElementById('documentsCount').textContent = window.REAL_PROJECT_DATA.stats.documentsProcessed.toLocaleString();
+        document.getElementById('monthlyRevenue').textContent = new Intl.NumberFormat('fr-CA', { 
+            style: 'currency', 
+            currency: 'CAD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(window.REAL_PROJECT_DATA.stats.monthlyRevenue);
+        
+        // Update badges
+        document.getElementById('emailBadge').textContent = window.REAL_PROJECT_DATA.recentEmails.filter(e => e.unread).length;
+        document.getElementById('notesBadge').textContent = window.REAL_PROJECT_DATA.recentNotes.filter(n => n.status === 'pending').length;
+        document.getElementById('directivesBadge').textContent = currentProject === 'S-1086' ? 32 : 28;
+    }
+    
+    // Update directives statistics
+    function updateDirectivesStats(project) {
+        // Update the summary cards in directives view
+        const extrasEl = document.querySelector('#directives .text-green-600');
+        const creditsEl = document.querySelector('#directives .text-red-600');
+        const netEl = document.querySelector('#directives .text-blue-600');
+        
+        if (extrasEl && project.totalExtras) {
+            extrasEl.textContent = new Intl.NumberFormat('fr-CA', { 
+                style: 'currency', 
+                currency: 'CAD' 
+            }).format(project.totalExtras);
+        }
+        
+        if (creditsEl && project.totalCredits) {
+            creditsEl.textContent = `(${new Intl.NumberFormat('fr-CA', { 
+                style: 'currency', 
+                currency: 'CAD' 
+            }).format(Math.abs(project.totalCredits))})`;
+        }
+        
+        if (netEl && project.netImpact) {
+            netEl.textContent = `(${new Intl.NumberFormat('fr-CA', { 
+                style: 'currency', 
+                currency: 'CAD' 
+            }).format(Math.abs(project.netImpact))})`;
+        }
+    }
+    
     // Initialize everything
     initCharts();
     setupEmailHandlers();
     updateEmailBadge();
     simulateRealTimeUpdates();
+    
+    // Load real data after a short delay to ensure dashboard_real_data.js is loaded
+    setTimeout(() => {
+        updateDashboardStats();
+    }, 100);
 
     // Add some interactivity to other elements
     document.querySelectorAll('button').forEach(btn => {

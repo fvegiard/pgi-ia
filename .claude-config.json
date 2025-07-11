@@ -3,9 +3,11 @@
   "version": "4.1",
   "description": "Progiciel de Gestion Intégré assisté par Intelligence Artificielle",
   "documentation": {
+    "github_first_policy": "GITHUB_FIRST_MANDATORY.md",
+    "master_reference": "CLAUDE_MASTER_REFERENCE.md",
+    "system_inventory": "SYSTEM_INVENTORY.md",
     "main": "CLAUDE.md",
     "desktop_setup": "CLAUDE_DESKTOP_SETUP.md",
-    "project_summary": "MISSION_ACCOMPLIE.md",
     "readme": "README.md"
   },
   "environment": {
@@ -14,14 +16,19 @@
     "backend_port": 5000,
     "gpu_required": true
   },
+  "github_first_rules": {
+    "mandatory_start": "./check_github_first.sh",
+    "before_create": "./verify_file_exists.sh [path]",
+    "always_pull": "git pull origin main",
+    "immediate_push": "git add . && git commit -m 'msg' && git push"
+  },
   "quick_commands": {
+    "github_check": "./check_github_first.sh",
+    "verify_file": "./verify_file_exists.sh",
     "activate": "source venv_pgi_ia/bin/activate",
     "start_all": "python start_all_services.py",
     "backend": "python backend/main.py",
-    "verify": "python verify_complete_system.py",
-    "audit_deepseek": "python audit_deepseek.py",
-    "audit_justina": "python audit_justina.py",
-    "train": "python deepseek_finetune_english_complete.py"
+    "verify": "python verify_complete_system.py"
   },
   "paths": {
     "wsl": "/home/fvegi/dev/pgi-ia",

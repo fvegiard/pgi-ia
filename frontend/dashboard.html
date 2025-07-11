@@ -111,6 +111,24 @@
                         <i data-lucide="file-search"></i>
                         <span>Documents</span>
                     </button>
+                    <button class="sidebar-item" data-tab="notes">
+                        <i data-lucide="edit-3"></i>
+                        <span>Notes</span>
+                        <span class="badge bg-yellow-500" id="notesBadge">2</span>
+                    </button>
+                    <button class="sidebar-item" data-tab="photos">
+                        <i data-lucide="camera"></i>
+                        <span>Photos</span>
+                    </button>
+                    <button class="sidebar-item" data-tab="directives">
+                        <i data-lucide="clipboard-list"></i>
+                        <span>Directives</span>
+                        <span class="badge bg-blue-500" id="directivesBadge">32</span>
+                    </button>
+                    <button class="sidebar-item" data-tab="plan">
+                        <i data-lucide="map"></i>
+                        <span>Plan Principal</span>
+                    </button>
                     <button class="sidebar-item" data-tab="ai">
                         <i data-lucide="brain"></i>
                         <span>Analyses IA</span>
@@ -141,6 +159,25 @@
 
         <!-- Main Content -->
         <div class="flex-1 overflow-auto">
+            <!-- Project Selector Header -->
+            <div class="bg-gray-800 border-b border-gray-700 px-8 py-4">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-4">
+                        <label class="text-sm font-medium text-gray-300">Projet actif:</label>
+                        <select id="projectSelector" class="bg-gray-700 border border-gray-600 rounded-md px-4 py-2 text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="S-1086">S-1086 - Centre Culturel Kahnawake (KORLCC)</option>
+                            <option value="C-24-048">C-24-048 - Place Alexis-Nihon</option>
+                            <option value="C-22-011">C-22-011 - Parc Aquatique Beloeil</option>
+                            <option value="E-25-001">E-25-001 - Hydro-Québec Roussillon</option>
+                            <option value="C-24-089">C-24-089 - Cégep Montmorency</option>
+                        </select>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="text-sm text-gray-400">Dernière sync:</span>
+                        <span class="text-sm text-green-400">Il y a 2 min</span>
+                    </div>
+                </div>
+            </div>
             <div class="p-8">
                 <!-- Dashboard Tab -->
                 <div id="dashboard" class="tab-content active">
@@ -155,7 +192,7 @@
                                 </div>
                                 <span class="text-sm font-medium text-green-600">+12%</span>
                             </div>
-                            <h3 class="text-2xl font-bold text-gray-900">47</h3>
+                            <h3 class="text-2xl font-bold text-gray-900" id="activeProjectsCount">12</h3>
                             <p class="text-sm text-gray-600 mt-1">Projets actifs</p>
                         </div>
                         
@@ -177,7 +214,7 @@
                                 </div>
                                 <span class="text-sm font-medium text-green-600">+24%</span>
                             </div>
-                            <h3 class="text-2xl font-bold text-gray-900">324</h3>
+                            <h3 class="text-2xl font-bold text-gray-900" id="documentsCount">3,247</h3>
                             <p class="text-sm text-gray-600 mt-1">Documents</p>
                         </div>
                         
@@ -199,7 +236,7 @@
                                 </div>
                                 <span class="text-sm font-medium text-green-600">+15%</span>
                             </div>
-                            <h3 class="text-2xl font-bold text-gray-900">72,000$</h3>
+                            <h3 class="text-2xl font-bold text-gray-900" id="monthlyRevenue">1,250,000$</h3>
                             <p class="text-sm text-gray-600 mt-1">CA mensuel</p>
                         </div>
                         
@@ -600,6 +637,265 @@
                 <div id="documents" class="tab-content">
                     <h2 class="text-2xl font-bold mb-6">Documents</h2>
                     <!-- Documents content -->
+                </div>
+
+                <div id="notes" class="tab-content">
+                    <h2 class="text-2xl font-bold mb-6">Notes intelligentes</h2>
+                    
+                    <!-- Notes Header -->
+                    <div class="bg-white rounded-lg shadow p-6 mb-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <h3 class="text-lg font-semibold">Système de notes avec reformulation IA</h3>
+                                <p class="text-sm text-gray-600 mt-1">Écrivez vos notes terrain, l'IA les reformule professionnellement</p>
+                            </div>
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg flex items-center">
+                                <i data-lucide="plus" class="w-4 h-4 mr-2"></i>
+                                Nouvelle note
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Notes List -->
+                    <div class="space-y-4" id="notesList">
+                        <!-- Note 1 -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center">
+                                    <span class="text-sm font-medium px-3 py-1 bg-purple-100 text-purple-700 rounded-full">Technique</span>
+                                    <span class="text-sm text-gray-500 ml-3">11 juillet 2025, 10:30</span>
+                                </div>
+                                <button class="text-green-600 hover:text-green-700 text-sm font-medium">Approuvée ✓</button>
+                            </div>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-700 mb-2">Note originale:</h4>
+                                    <p class="text-sm text-gray-600 italic">Problème détecté conduits 2e étage près escalier nord. Conflit avec structure acier. Voir avec ingénieur.</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-700 mb-2">Reformulation IA:</h4>
+                                    <p class="text-sm text-gray-900"><strong>Conflit détecté</strong>: Intersection conduits électriques/structure acier au 2e étage (secteur nord). <strong>Action requise</strong>: Consultation ingénieur structure pour solution de contournement.</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-center text-sm text-gray-500">
+                                <i data-lucide="map-pin" class="w-4 h-4 mr-1"></i>
+                                Projet: S-1086 - Centre Culturel Kahnawake
+                            </div>
+                        </div>
+
+                        <!-- Note 2 -->
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <div class="flex items-start justify-between mb-4">
+                                <div class="flex items-center">
+                                    <span class="text-sm font-medium px-3 py-1 bg-blue-100 text-blue-700 rounded-full">Client</span>
+                                    <span class="text-sm text-gray-500 ml-3">11 juillet 2025, 09:15</span>
+                                </div>
+                                <button class="text-yellow-600 hover:text-yellow-700 text-sm font-medium">En attente d'approbation</button>
+                            </div>
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-700 mb-2">Note originale:</h4>
+                                    <p class="text-sm text-gray-600 italic">Client veut ajouter prises USB dans salles réunion B2. Pas dans plans originaux.</p>
+                                </div>
+                                <div>
+                                    <h4 class="text-sm font-medium text-gray-700 mb-2">Reformulation IA:</h4>
+                                    <p class="text-sm text-gray-900"><strong>Demande client</strong>: Installation prises USB-C dans salles de réunion niveau B2. <strong>Impact</strong>: Modification plans électriques + nouvelle directive de changement requise.</p>
+                                </div>
+                            </div>
+                            <div class="mt-4 flex items-center text-sm text-gray-500">
+                                <i data-lucide="map-pin" class="w-4 h-4 mr-1"></i>
+                                Projet: C-24-048 - Place Alexis-Nihon
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="photos" class="tab-content">
+                    <h2 class="text-2xl font-bold mb-6">Photos géolocalisées</h2>
+                    
+                    <!-- Upload Zone -->
+                    <div class="bg-white rounded-lg shadow p-8 mb-6 border-2 border-dashed border-gray-300 hover:border-blue-400 transition-colors">
+                        <div class="text-center">
+                            <i data-lucide="upload-cloud" class="w-12 h-12 text-gray-400 mx-auto mb-4"></i>
+                            <h3 class="text-lg font-medium mb-2">Téléverser des photos du chantier</h3>
+                            <p class="text-sm text-gray-600 mb-4">Les photos iPhone conservent les coordonnées GPS qui seront automatiquement extraites</p>
+                            <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg">
+                                Choisir des photos
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Photos Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Photo 1 -->
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <img src="/api/placeholder/400/300" alt="Installation panneaux" class="w-full h-48 object-cover">
+                            <div class="p-4">
+                                <h4 class="font-medium mb-1">Installation panneaux électriques</h4>
+                                <p class="text-sm text-gray-600 mb-3">Salle mécanique - Kahnawake</p>
+                                <div class="space-y-1 text-sm">
+                                    <div class="flex items-center text-gray-500">
+                                        <i data-lucide="calendar" class="w-4 h-4 mr-2"></i>
+                                        10 juillet 2025, 14:23
+                                    </div>
+                                    <div class="flex items-center text-gray-500">
+                                        <i data-lucide="map-pin" class="w-4 h-4 mr-2"></i>
+                                        45.4003°N, 73.8237°O
+                                    </div>
+                                    <div class="flex items-center text-blue-600">
+                                        <i data-lucide="map" class="w-4 h-4 mr-2"></i>
+                                        Position sur plan: X:234, Y:567
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Photo 2 -->
+                        <div class="bg-white rounded-lg shadow overflow-hidden">
+                            <img src="/api/placeholder/400/300" alt="Conduits principaux" class="w-full h-48 object-cover">
+                            <div class="p-4">
+                                <h4 class="font-medium mb-1">Conduits principaux</h4>
+                                <p class="text-sm text-gray-600 mb-3">Entrée bassin - PAB</p>
+                                <div class="space-y-1 text-sm">
+                                    <div class="flex items-center text-gray-500">
+                                        <i data-lucide="calendar" class="w-4 h-4 mr-2"></i>
+                                        10 juillet 2025, 15:45
+                                    </div>
+                                    <div class="flex items-center text-gray-500">
+                                        <i data-lucide="map-pin" class="w-4 h-4 mr-2"></i>
+                                        45.5807°N, 73.3265°O
+                                    </div>
+                                    <div class="flex items-center text-blue-600">
+                                        <i data-lucide="map" class="w-4 h-4 mr-2"></i>
+                                        Position sur plan: X:456, Y:789
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="directives" class="tab-content">
+                    <h2 class="text-2xl font-bold mb-6">Directives de changement</h2>
+                    
+                    <!-- Summary Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-sm font-medium text-gray-600">Total Extras</h3>
+                            <p class="text-2xl font-bold text-green-600 mt-1">155 940,45 $</p>
+                            <p class="text-sm text-gray-500 mt-2">Approuvés & Soumis</p>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-sm font-medium text-gray-600">Total Crédits</h3>
+                            <p class="text-2xl font-bold text-red-600 mt-1">(390 824,09 $)</p>
+                            <p class="text-sm text-gray-500 mt-2">Approuvés & Soumis</p>
+                        </div>
+                        <div class="bg-white rounded-lg shadow p-6">
+                            <h3 class="text-sm font-medium text-gray-600">Impact Net</h3>
+                            <p class="text-2xl font-bold text-blue-600 mt-1">(234 883,64 $)</p>
+                            <p class="text-sm text-gray-500 mt-2">Sur le budget initial</p>
+                        </div>
+                    </div>
+
+                    <!-- Directives Table -->
+                    <div class="bg-white rounded-lg shadow overflow-hidden">
+                        <div class="p-6 border-b border-gray-200">
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-lg font-semibold">Directives actives</h3>
+                                <div class="flex space-x-2">
+                                    <input type="text" placeholder="Rechercher..." class="px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                                    <select class="px-4 py-2 border border-gray-300 rounded-lg text-sm">
+                                        <option>Tous les statuts</option>
+                                        <option>À préparer</option>
+                                        <option>Soumis</option>
+                                        <option>Approuvé</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-200">
+                                <thead class="bg-gray-50">
+                                    <tr>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"># Directive</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
+                                        <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Montant</th>
+                                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="bg-white divide-y divide-gray-200" id="directivesTableBody">
+                                    <!-- Les directives seront chargées dynamiquement -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="plan" class="tab-content">
+                    <h2 class="text-2xl font-bold mb-6">Plan principal avec marqueurs</h2>
+                    
+                    <div class="bg-white rounded-lg shadow p-6">
+                        <div class="mb-4 flex items-center justify-between">
+                            <h3 class="text-lg font-semibold">Plan du projet actif</h3>
+                            <div class="flex space-x-2">
+                                <button class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium">
+                                    <i data-lucide="zoom-in" class="w-4 h-4 inline mr-1"></i>
+                                    Zoom
+                                </button>
+                                <button class="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-sm font-medium">
+                                    <i data-lucide="layers" class="w-4 h-4 inline mr-1"></i>
+                                    Calques
+                                </button>
+                                <button class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg text-sm font-medium">
+                                    <i data-lucide="map-pin" class="w-4 h-4 inline mr-1"></i>
+                                    Ajouter marqueur
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Plan Container -->
+                        <div class="relative bg-gray-100 rounded-lg overflow-hidden" style="height: 600px;">
+                            <div class="absolute inset-0 flex items-center justify-center text-gray-400">
+                                <div class="text-center">
+                                    <i data-lucide="map" class="w-16 h-16 mx-auto mb-4"></i>
+                                    <p class="text-lg font-medium">Plan principal du projet</p>
+                                    <p class="text-sm">Les photos géolocalisées apparaîtront ici</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Exemple de marqueurs -->
+                            <div class="absolute" style="top: 30%; left: 40%;">
+                                <div class="relative">
+                                    <div class="absolute -top-2 -left-2 w-4 h-4 bg-blue-500 rounded-full animate-ping"></div>
+                                    <i data-lucide="map-pin" class="w-6 h-6 text-blue-600"></i>
+                                </div>
+                            </div>
+                            
+                            <div class="absolute" style="top: 60%; left: 70%;">
+                                <div class="relative">
+                                    <div class="absolute -top-2 -left-2 w-4 h-4 bg-green-500 rounded-full animate-ping"></div>
+                                    <i data-lucide="camera" class="w-6 h-6 text-green-600"></i>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Legend -->
+                        <div class="mt-4 flex items-center space-x-6 text-sm">
+                            <div class="flex items-center">
+                                <i data-lucide="map-pin" class="w-4 h-4 text-blue-600 mr-2"></i>
+                                <span>Points d'intérêt</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i data-lucide="camera" class="w-4 h-4 text-green-600 mr-2"></i>
+                                <span>Photos géolocalisées</span>
+                            </div>
+                            <div class="flex items-center">
+                                <i data-lucide="alert-triangle" class="w-4 h-4 text-orange-600 mr-2"></i>
+                                <span>Zones à problème</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="ai" class="tab-content">

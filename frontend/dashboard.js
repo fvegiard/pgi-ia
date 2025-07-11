@@ -65,12 +65,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Global chart instances
+    let revenueChart = null;
+    let projectChart = null;
+    
     // Initialize charts
     function initCharts() {
         // Revenue Chart
         const revenueCtx = document.getElementById('revenueChart');
         if (revenueCtx) {
-            new Chart(revenueCtx, {
+            // Destroy existing chart if it exists
+            if (revenueChart) {
+                revenueChart.destroy();
+            }
+            
+            revenueChart = new Chart(revenueCtx, {
                 type: 'line',
                 data: {
                     labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun'],
@@ -108,7 +117,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Project Chart
         const projectCtx = document.getElementById('projectChart');
         if (projectCtx) {
-            new Chart(projectCtx, {
+            // Destroy existing chart if it exists
+            if (projectChart) {
+                projectChart.destroy();
+            }
+            
+            projectChart = new Chart(projectCtx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Commercial', 'Industriel', 'Résidentiel'],

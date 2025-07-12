@@ -1,0 +1,66 @@
+{
+  "timestamp": "2025-07-12T17:53:54.269463",
+  "version": "PGI-IA v4.1",
+  "components": {
+    "backend": [
+      {
+        "endpoint": "Root API",
+        "url": "http://localhost:5001/",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "endpoint": "Projects",
+        "url": "http://localhost:5001/projects",
+        "status": 200,
+        "ok": true
+      },
+      {
+        "endpoint": "Status",
+        "url": "http://localhost:5001/api/status",
+        "status": 404,
+        "ok": false
+      },
+      {
+        "endpoint": "Health (Docker)",
+        "url": "http://localhost:5000/health",
+        "status": 200,
+        "ok": true
+      }
+    ],
+    "docker": {
+      "active": 2,
+      "containers": [
+        {
+          "name": "pgi-ia-frontend-1",
+          "image": "nginx:alpine",
+          "status": "Up 4 hours",
+          "ports": "0.0.0.0:80->80/tcp, [::]:80->80/tcp"
+        },
+        {
+          "name": "pgi-ia-backend-1",
+          "image": "pgi-ia-backend",
+          "status": "Up 4 hours",
+          "ports": "0.0.0.0:5000->5000/tcp, [::]:5000->5000/tcp"
+        }
+      ]
+    },
+    "files": {
+      "python": 15,
+      "javascript": 5,
+      "html": 4,
+      "css": 1,
+      "yaml": 3,
+      "json": 3,
+      "total": 129
+    }
+  },
+  "api_status": {},
+  "security": {
+    "env_files_protected": true,
+    "api_keys_exposed": false,
+    "cors_configured": true,
+    "https_enabled": false
+  },
+  "performance": {}
+}

@@ -1,87 +1,12 @@
-from flask import Flask, request, jsonify
-from flask_cors import CORS
+#!/usr/bin/env python3
+"""
+Ajoute l'analyse IA automatique au backend
+"""
+
 import os
-import uuid
-from datetime import datetime
-import sqlite3
-import subprocess
-from openai import OpenAI
-import json
-import threading
-from flask_cors import CORS
-import os
-import uuid
-from datetime import datetime
-import sqlite3
 
-app = Flask(__name__)
-CORS(app)
-
-# Configuration
-UPLOAD_FOLDER = 'uploads'
-DATABASE = 'pgi_ia.db'
-ALLOWED_EXTENSIONS = {'pdf'}
-
-# Créer le dossier uploads s'il n'existe pas
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)
-
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-def init_db():
-    """Initialise la base de données"""
-    conn = sqlite3.connect(DATABASE)
-    c = conn.cursor()
-    c.execute('''CREATE TABLE IF NOT EXISTS documents
-                 (id TEXT PRIMARY KEY,
-                  filename TEXT NOT NULL,
-                  project_id TEXT NOT NULL,
-                  upload_date TEXT NOT NULL,
-                  status TEXT DEFAULT 'pending',
-                  analysis_result TEXT)''')
-    conn.commit()
-    conn.close()
-
-@app.route('/health')
-def health():
-    return jsonify({'status': 'ok', 'service': 'PGI-IA Backend'})
-
-@app.route('/api/documents', methods=['GET'])
-def get_documents():
-    """Récupère la liste des documents"""
-    try:
-        conn = sqlite3.connect(DATABASE)
-        c = conn.cursor()
-        c.execute("""SELECT id, filename, project_id, upload_date, status 
-                     FROM documents 
-                     ORDER BY upload_date DESC 
-                     LIMIT 20""")
-        
-        documents = []
-        for row in c.fetchall():
-            documents.append({
-                'id': row[0],
-                'filename': row[1],
-                'project': row[2],
-                'date': row[3],
-                'status': row[4]
-            })
-        
-        conn.close()
-        return jsonify(documents)
-        
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/')
-def index():
-    return jsonify({
-        'service': 'PGI-IA Backend',
-        'version': '1.0',
-        'endpoints': ['/upload', '/health', '/api/documents']
-    })
-
-
+# Code pour ajouter l'analyse IA
+analysis_code = '''
 import subprocess
 from openai import OpenAI
 import json
@@ -105,7 +30,7 @@ def extract_text_from_pdf(filepath):
         with open(filepath, 'rb') as file:
             pdf_reader = PyPDF2.PdfReader(file)
             for page in pdf_reader.pages:
-                text += page.extract_text() + "\n"
+                text += page.extract_text() + "\\n"
         if len(text.strip()) > 100:
             return text
     except:
@@ -124,7 +49,7 @@ def extract_text_from_pdf(filepath):
     try:
         images = convert_from_path(filepath)
         for image in images:
-            text += pytesseract.image_to_string(image) + "\n"
+            text += pytesseract.image_to_string(image) + "\\n"
     except:
         pass
     
@@ -227,6 +152,7 @@ def process_pdf_analysis(file_id, filepath, filename):
         "analysis": analysis
     }
 
+# Modifier la fonction upload pour lancer l'analyse
 @app.route('/upload', methods=['POST'])
 def upload_file():
     """Endpoint pour upload de fichiers PDF avec analyse automatique"""
@@ -307,8 +233,35 @@ def get_analysis(file_id):
         
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+'''
 
+# Lire le backend actuel
+with open('backend/main.py', 'r', encoding='utf-8') as f:
+    content = f.read()
 
-if __name__ == '__main__':
-    init_db()
-    app.run(host='0.0.0.0', port=5000, debug=True)
+# Ajouter les imports nécessaires
+imports = '''from flask import Flask, request, jsonify
+from flask_cors import CORS
+import os
+import uuid
+from datetime import datetime
+import sqlite3
+import subprocess
+from openai import OpenAI
+import json
+import threading'''
+
+content = content.replace('from flask import Flask, request, jsonify', imports)
+
+# Ajouter le code d'analyse avant if __name__
+main_block = "if __name__ == '__main__':"
+content = content.replace(main_block, analysis_code + '\n\n' + main_block)
+
+# Sauvegarder
+with open('backend/main.py', 'w', encoding='utf-8') as f:
+    f.write(content)
+
+print("✅ Analyse IA ajoutée au backend!")
+print("🧠 DeepSeek configuré pour l'analyse automatique")
+print("🔄 L'analyse se lance automatiquement après chaque upload")
+print("\n⚠️  Redémarrage du backend nécessaire...")

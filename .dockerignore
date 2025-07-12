@@ -1,0 +1,8 @@
+venv_pgi_ia/
+__pycache__/
+*.pyc
+.git/
+logs/
+cache/
+*.log
+.env.local

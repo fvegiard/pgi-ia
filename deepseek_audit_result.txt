@@ -1,0 +1,32 @@
+### Évaluation de la Préparation pour la Présentation aux Actionnaires  
+
+#### **1. Backend Flask Opérationnel**  
+- **✅ Points Forts** :  
+  - API fonctionnelle avec endpoints documentés (swagger/OpenAPI recommandé).  
+  - Gestion des erreurs et logs en place pour traçabilité.  
+- **⚠️ Vérifications Requises** :  
+  - **Performance** : Test de charge (ex: Locust) pour garantir la stabilité pendant la démo.  
+  - **Sécurité** : Authentification (JWT/OAuth) et protection des endpoints critiques (CORS, rate limiting).  
+
+#### **2. Docker Configuré**  
+- **✅ Points Forts** :  
+  - Environnement reproductible et isolé.  
+  - Docker Compose pour l'orchestration (si bases de données/services multiples).  
+- **⚠️ Vérifications Requises** :  
+  - **Optimisation** : Vérifier la taille de l'image (éviter les images lourdes comme `python:latest`).  
+  - **Resilience** : Configurer des healthchecks dans `docker-compose.yml`.  
+
+#### **3. Base de Données avec Projets Réels**  
+- **✅ Points Forts** :  
+  - Données réelles augmentent la crédibilité (ex: projets avec KPIs business).  
+  - Schéma relationnel clair et indexes pour les requêtes complexes.  
+- **⚠️ Vérifications Requises** :  
+  - **Backup** : Avoir un dump SQL récent en cas de crash pendant la présentation.  
+  - **Anonymisation** : Si données sensibles, s'assurer qu'elles sont masquées (RGPD).  
+
+#### **4. Points Supplémentaires Critiques**  
+- **📊 Dashboard/UI** :  
+  - Intégrer un frontend (ex: React/Streamlit) ou au moins des templates Flask avec visualisations (Plotly, Chart.js).  
+  - Préparer des slides de backup (PDF) avec captures d'écran des résultats clés.  
+- **📌 Scénario de Démo** :  
+  - Script pas-à-pas (ex: "Créer un projet → Lancer l'IA → Afficher les

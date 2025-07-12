@@ -21,7 +21,7 @@ ALLOWED_EXTENSIONS = {'pdf'}
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # Configuration DeepSeek
-DEEPSEEK_API_KEY = "sk-ccc37a109afb461989af8cf994a8bc60"
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
 deepseek_client = OpenAI(
     api_key=DEEPSEEK_API_KEY,
     base_url="https://api.deepseek.com/v1"

@@ -8,7 +8,7 @@ Lis d'abord CLAUDE_MASTER_REFERENCE.md dans /home/fvegi/dev/pgi-ia pour le conte
 
 État actuel :
 - Projet : Gestion électrique industrielle avec IA
-- DeepSeek API : ✅ Configurée (sk-ccc37a109afb461989af8cf994a8bc60)
+- DeepSeek API : ✅ Configurée (${DEEPSEEK_API_KEY})
 - Gemini : Scripts créés, clé à configurer
 - Google Session : Manager créé pour cookies
 - Docker : Architecture complète prête

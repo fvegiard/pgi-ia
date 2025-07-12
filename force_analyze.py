@@ -10,7 +10,7 @@ from openai import OpenAI
 
 # Config
 DATABASE = 'pgi_ia.db'
-DEEPSEEK_API_KEY = "sk-ccc37a109afb461989af8cf994a8bc60"
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
 
 # Client DeepSeek
 client = OpenAI(

@@ -11,7 +11,7 @@ import os
 app = Flask(__name__)
 
 # DeepSeek configuration
-DEEPSEEK_API_KEY = os.environ.get('DEEPSEEK_API_KEY', 'sk-ccc37a109afb461989af8cf994a8bc60')
+DEEPSEEK_API_KEY = os.environ.get("DEEPSEEK_API_KEY", "")
 client = OpenAI(
     api_key=DEEPSEEK_API_KEY,
     base_url="https://api.deepseek.com/v1"

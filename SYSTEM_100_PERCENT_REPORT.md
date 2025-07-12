@@ -21,7 +21,7 @@ Le système PGI-IA est maintenant **100% opérationnel** avec toutes les fonctio
 
 ### APIs Configurées:
 ```
-1. OpenAI API: sk-proj-a9ep26vz6IqS... ✅ (depuis Codex auth.json)
+1. OpenAI API: ${OPENAI_API_KEY} ✅ (depuis Codex auth.json)
 2. DeepSeek API: sk-ccc37a109afb46198... ✅ (active et testée)
 3. Gemini API: En attente clé ⏳ (https://makersuite.google.com/app/apikey)
 4. Anthropic API: En attente clé ⏳

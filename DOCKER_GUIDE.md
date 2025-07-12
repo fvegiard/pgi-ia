@@ -111,10 +111,10 @@ docker system prune -a
 ### Variables d'environnement (.env)
 ```env
 # APIs
-DEEPSEEK_API_KEY=sk-ccc37a109afb461989af8cf994a8bc60
+DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY}
 GEMINI_API_KEY=AIzaSy...
-OPENAI_API_KEY=sk-proj-...
-ANTHROPIC_API_KEY=sk-ant-...
+OPENAI_API_KEY=${OPENAI_API_KEY}
+ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
 
 # Database
 POSTGRES_USER=pgiia

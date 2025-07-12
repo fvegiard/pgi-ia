@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Plan Principal Kahnawake EE-M-RC01</title>
+    <style>
+        .plan-container {
+            position: relative;
+            width: 100%;
+            height: 600px;
+            background: #1a1a1a;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+        
+        .plan-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            filter: brightness(0.9);
+        }
+        
+        /* Grid pattern pour simuler un plan technique */
+        .plan-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            pointer-events: none;
+        }
+        
+        /* Marqueurs animés */
+        .marker {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            cursor: pointer;
+            z-index: 10;
+        }
+        
+        .marker-icon {
+            width: 24px;
+            height: 24px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+        }
+        
+        .marker-pulse {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+        
+        .marker-blue .marker-pulse {
+            background: rgba(59, 130, 246, 0.3);
+        }
+        
+        .marker-green .marker-pulse {
+            background: rgba(16, 185, 129, 0.3);
+        }
+        
+        .marker-orange .marker-pulse {
+            background: rgba(251, 146, 60, 0.3);
+        }
+        
+        .marker-red .marker-pulse {
+            background: rgba(239, 68, 68, 0.3);
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0.8;
+            }
+            50% {
+                transform: translate(-50%, -50%) scale(1.5);
+                opacity: 0.3;
+            }
+            100% {
+                transform: translate(-50%, -50%) scale(0.8);
+                opacity: 0.8;
+            }
+        }
+        
+        /* Tooltip */
+        .marker-tooltip {
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            white-space: nowrap;
+            margin-bottom: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            pointer-events: none;
+        }
+        
+        .marker:hover .marker-tooltip {
+            opacity: 1;
+        }
+        
+        /* Plan title overlay */
+        .plan-title {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-family: monospace;
+        }
+        
+        .plan-title h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .plan-title p {
+            margin: 4px 0 0 0;
+            font-size: 14px;
+            color: #9CA3AF;
+        }
+    </style>
+</head>
+<body>
+    <div class="plan-container">
+        <!-- Grid de fond -->
+        <div class="plan-grid"></div>
+        
+        <!-- Titre du plan -->
+        <div class="plan-title">
+            <h3>PLAN EE-M-RC01</h3>
+            <p>Centre Culturel Kahnawake - Rez-de-chaussée Électrique/Mécanique</p>
+        </div>
+        
+        <!-- Marqueur 1: Panneaux électriques -->
+        <div class="marker marker-blue" style="top: 30%; left: 25%;">
+            <div class="marker-pulse"></div>
+            <svg class="marker-icon" fill="#3B82F6" viewBox="0 0 24 24">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+            </svg>
+            <div class="marker-tooltip">Installation panneaux électriques - Salle mécanique</div>
+        </div>
+        
+        <!-- Marqueur 2: Photo géolocalisée -->
+        <div class="marker marker-green" style="top: 45%; left: 60%;">
+            <div class="marker-pulse"></div>
+            <svg class="marker-icon" fill="#10B981" viewBox="0 0 24 24">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+            </svg>
+            <div class="marker-tooltip">Photo: Conduits principaux installés - 10/07/2025 14:23</div>
+        </div>
+        
+        <!-- Marqueur 3: Zone problème -->
+        <div class="marker marker-orange" style="top: 65%; left: 40%;">
+            <div class="marker-pulse"></div>
+            <svg class="marker-icon" fill="#FB923C" viewBox="0 0 24 24">
+                <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/>
+            </svg>
+            <div class="marker-tooltip">Conflit détecté: Conduits vs structure acier - 2e étage</div>
+        </div>
+        
+        <!-- Marqueur 4: QRT Active -->
+        <div class="marker marker-red" style="top: 20%; left: 75%;">
+            <div class="marker-pulse"></div>
+            <svg class="marker-icon" fill="#EF4444" viewBox="0 0 24 24">
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/>
+            </svg>
+            <div class="marker-tooltip">QRT #361: Luminaire L3 et K - En attente réponse</div>
+        </div>
+        
+        <!-- Marqueur 5: Directive approuvée -->
+        <div class="marker marker-green" style="top: 80%; left: 20%;">
+            <div class="marker-pulse"></div>
+            <svg class="marker-icon" fill="#10B981" viewBox="0 0 24 24">
+                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+            </svg>
+            <div class="marker-tooltip">CO-ME-028: Valve supervisée - Complété</div>
+        </div>
+        
+        <!-- Zone de travail active -->
+        <div style="position: absolute; top: 25%; left: 20%; width: 15%; height: 20%; border: 2px dashed #3B82F6; border-radius: 8px; background: rgba(59, 130, 246, 0.1);">
+            <div style="position: absolute; top: -25px; left: 50%; transform: translateX(-50%); background: #3B82F6; color: white; padding: 4px 12px; border-radius: 4px; font-size: 12px; white-space: nowrap;">
+                Zone active: Salle mécanique
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Animation des marqueurs au survol
+        document.querySelectorAll('.marker').forEach(marker => {
+            marker.addEventListener('click', function() {
+                const tooltip = this.querySelector('.marker-tooltip').textContent;
+                alert('Détails: ' + tooltip);
+            });
+        });
+    </script>
+</body>
+</html>

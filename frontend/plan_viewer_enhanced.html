@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plan Viewer Enhanced - PGI-IA</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .plan-container {
+            cursor: grab;
+            user-select: none;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        .plan-container.grabbing {
+            cursor: grabbing;
+        }
+        .marker {
+            transition: transform 0.2s ease;
+        }
+        .marker:hover {
+            transform: scale(1.2);
+        }
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                opacity: 0.7;
+            }
+            50% {
+                transform: scale(1.1);
+                opacity: 0.3;
+            }
+            100% {
+                transform: scale(0.95);
+                opacity: 0.7;
+            }
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-4">
+        <h1 class="text-2xl font-bold mb-4">Visualiseur de Plan Amélioré</h1>
+        
+        <div class="bg-white rounded-lg shadow-lg p-4">
+            <!-- Contrôles -->
+            <div class="mb-4 flex items-center justify-between">
+                <div class="flex space-x-2">
+                    <button id="zoomIn" class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                        </svg>
+                    </button>
+                    <button id="zoomOut" class="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM13 10H7"></path>
+                        </svg>
+                    </button>
+                    <button id="resetView" class="px-3 py-2 bg-gray-500 text-white rounded hover:bg-gray-600">
+                        Réinitialiser
+                    </button>
+                    <span class="px-3 py-2 bg-gray-100 rounded">
+                        Zoom: <span id="zoomLevel">100</span>%
+                    </span>
+                </div>
+                
+                <div class="flex space-x-2">
+                    <button id="toggleMarkers" class="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600">
+                        Afficher/Masquer Marqueurs
+                    </button>
+                    <button id="addMarker" class="px-3 py-2 bg-orange-500 text-white rounded hover:bg-orange-600">
+                        Ajouter Marqueur
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Conteneur du plan -->
+            <div class="relative overflow-hidden rounded-lg bg-gray-900" style="height: 700px;">
+                <div id="planWrapper" class="plan-container absolute inset-0">
+                    <img id="planImage" 
+                         src="assets/plans/EC-M-RC01-TELECOM-CONDUITS-PATH---GROUND-LEVEL-Rev.1_page_1_web.jpg" 
+                         alt="Plan EC-M-RC01"
+                         class="absolute"
+                         style="transform-origin: center center;">
+                    
+                    <!-- Conteneur des marqueurs -->
+                    <div id="markersContainer" class="absolute inset-0"></div>
+                </div>
+            </div>
+            
+            <!-- Info panneau -->
+            <div id="infoPanel" class="mt-4 p-4 bg-gray-100 rounded-lg hidden">
+                <h3 class="font-bold mb-2">Information du marqueur</h3>
+                <p id="markerInfo" class="text-sm"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // État de l'application
+        const state = {
+            scale: 1,
+            translateX: 0,
+            translateY: 0,
+            isDragging: false,
+            startX: 0,
+            startY: 0,
+            markers: [
+                {
+                    id: 1,
+                    x: 25,
+                    y: 30,
+                    type: 'electrical',
+                    color: 'blue',
+                    title: 'Panneaux électriques',
+                    description: 'Installation panneaux électriques - Salle mécanique'
+                },
+                {
+                    id: 2,
+                    x: 60,
+                    y: 45,
+                    type: 'photo',
+                    color: 'green',
+                    title: 'Photo géolocalisée',
+                    description: 'Photo: Conduits principaux - 10/07/2025 14:23'
+                },
+                {
+                    id: 3,
+                    x: 40,
+                    y: 65,
+                    type: 'warning',
+                    color: 'orange',
+                    title: 'Zone problème',
+                    description: 'Conflit: Conduits vs structure acier - 2e étage'
+                },
+                {
+                    id: 4,
+                    x: 75,
+                    y: 20,
+                    type: 'qrt',
+                    color: 'red',
+                    title: 'QRT Active',
+                    description: 'QRT #361: Luminaire L3 et K - En attente'
+                }
+            ],
+            markersVisible: true,
+            addingMarker: false
+        };
+
+        // Éléments DOM
+        const planWrapper = document.getElementById('planWrapper');
+        const planImage = document.getElementById('planImage');
+        const markersContainer = document.getElementById('markersContainer');
+        const zoomLevel = document.getElementById('zoomLevel');
+        const infoPanel = document.getElementById('infoPanel');
+        const markerInfo = document.getElementById('markerInfo');
+
+        // Fonction de mise à jour de la transformation
+        function updateTransform() {
+            const transform = `translate(${state.translateX}px, ${state.translateY}px) scale(${state.scale})`;
+            planImage.style.transform = transform;
+            markersContainer.style.transform = transform;
+            zoomLevel.textContent = Math.round(state.scale * 100);
+        }
+
+        // Fonction de rendu des marqueurs
+        function renderMarkers() {
+            markersContainer.innerHTML = '';
+            
+            if (!state.markersVisible) return;
+            
+            state.markers.forEach(marker => {
+                const markerEl = document.createElement('div');
+                markerEl.className = 'absolute cursor-pointer marker';
+                markerEl.style.left = `${marker.x}%`;
+                markerEl.style.top = `${marker.y}%`;
+                markerEl.innerHTML = `
+                    <div class="relative">
+                        <div class="absolute -top-2 -left-2 w-10 h-10 bg-${marker.color}-500 rounded-full pulse opacity-30"></div>
+                        <div class="w-6 h-6 bg-${marker.color}-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                            ${marker.id}
+                        </div>
+                    </div>
+                `;
+                
+                markerEl.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    showMarkerInfo(marker);
+                });
+                
+                markersContainer.appendChild(markerEl);
+            });
+        }
+
+        // Afficher les informations du marqueur
+        function showMarkerInfo(marker) {
+            markerInfo.innerHTML = `
+                <strong>${marker.title}</strong><br>
+                ${marker.description}<br>
+                <small>Position: ${marker.x}%, ${marker.y}%</small>
+            `;
+            infoPanel.classList.remove('hidden');
+        }
+
+        // Gestion du zoom
+        document.getElementById('zoomIn').addEventListener('click', () => {
+            state.scale = Math.min(state.scale * 1.2, 5);
+            updateTransform();
+        });
+
+        document.getElementById('zoomOut').addEventListener('click', () => {
+            state.scale = Math.max(state.scale / 1.2, 0.5);
+            updateTransform();
+        });
+
+        document.getElementById('resetView').addEventListener('click', () => {
+            state.scale = 1;
+            state.translateX = 0;
+            state.translateY = 0;
+            updateTransform();
+        });
+
+        // Gestion du drag
+        planWrapper.addEventListener('mousedown', (e) => {
+            if (state.addingMarker) return;
+            
+            state.isDragging = true;
+            state.startX = e.clientX - state.translateX;
+            state.startY = e.clientY - state.translateY;
+            planWrapper.classList.add('grabbing');
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!state.isDragging) return;
+            
+            state.translateX = e.clientX - state.startX;
+            state.translateY = e.clientY - state.startY;
+            updateTransform();
+        });
+
+        document.addEventListener('mouseup', () => {
+            state.isDragging = false;
+            planWrapper.classList.remove('grabbing');
+        });
+
+        // Gestion du zoom avec la molette
+        planWrapper.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            
+            const delta = e.deltaY > 0 ? 0.9 : 1.1;
+            const newScale = Math.max(0.5, Math.min(5, state.scale * delta));
+            
+            // Zoom centré sur la position de la souris
+            const rect = planWrapper.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            
+            const dx = (x - state.translateX) * (1 - delta);
+            const dy = (y - state.translateY) * (1 - delta);
+            
+            state.scale = newScale;
+            state.translateX += dx;
+            state.translateY += dy;
+            
+            updateTransform();
+        });
+
+        // Toggle marqueurs
+        document.getElementById('toggleMarkers').addEventListener('click', () => {
+            state.markersVisible = !state.markersVisible;
+            renderMarkers();
+        });
+
+        // Ajouter marqueur
+        document.getElementById('addMarker').addEventListener('click', () => {
+            state.addingMarker = !state.addingMarker;
+            planWrapper.style.cursor = state.addingMarker ? 'crosshair' : 'grab';
+        });
+
+        // Clic pour ajouter un marqueur
+        planWrapper.addEventListener('click', (e) => {
+            if (!state.addingMarker) return;
+            
+            const rect = planWrapper.getBoundingClientRect();
+            const x = ((e.clientX - rect.left - state.translateX) / state.scale / rect.width) * 100;
+            const y = ((e.clientY - rect.top - state.translateY) / state.scale / rect.height) * 100;
+            
+            const newMarker = {
+                id: state.markers.length + 1,
+                x: x,
+                y: y,
+                type: 'custom',
+                color: 'purple',
+                title: 'Nouveau marqueur',
+                description: `Marqueur ajouté à ${Math.round(x)}%, ${Math.round(y)}%`
+            };
+            
+            state.markers.push(newMarker);
+            renderMarkers();
+            showMarkerInfo(newMarker);
+            
+            state.addingMarker = false;
+            planWrapper.style.cursor = 'grab';
+        });
+
+        // Initialisation
+        renderMarkers();
+        updateTransform();
+    </script>
+</body>
+</html>

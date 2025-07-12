@@ -1,0 +1,109 @@
+{
+  "timestamp": "2025-07-11T21:34:11.232190",
+  "issues": [
+    {
+      "severity": "HIGH",
+      "type": "file_organization",
+      "description": "20 fichiers Python dans le root - devrait \u00eatre dans scripts/",
+      "files": [
+        "train_deepseek_kahnawake_plans.py",
+        "google_session_manager.py",
+        "train_deepseek.py",
+        "update_dashboard_plan.py",
+        "audit_justina.py",
+        "gemini_pgi_integration.py",
+        "setup_complete_environment.py",
+        "verify_complete_system.py",
+        "start_all_services.py",
+        "setup_google_session.py",
+        "..."
+      ]
+    },
+    {
+      "severity": "MEDIUM",
+      "type": "version_control",
+      "description": "15 fichiers non committ\u00e9s",
+      "files": [
+        "M CLAUDE_MASTER_REFERENCE.md",
+        " M frontend/dashboard.html",
+        "?? COMPREHENSIVE_ANALYSIS_REPORT.md",
+        "?? COMPREHENSIVE_SYSTEM_ANALYSIS.md",
+        "?? PLAN_INTEGRATION_COMPLETE.md",
+        "?? PLAN_INTEGRATION_REPORT.md",
+        "?? audit_deepseek_expert.py",
+        "?? audit_system_quick.py",
+        "?? extract_pdf_plan.py",
+        "?? frontend/assets/",
+        "?? frontend/dashboard.html.backup",
+        "?? frontend/plan_placeholder.html",
+        "?? frontend/plan_viewer_enhanced.html",
+        "?? setup_sudo_access.sh",
+        "?? update_dashboard_plan.py"
+      ]
+    },
+    {
+      "severity": "LOW",
+      "type": "file_organization",
+      "description": "3 fichiers log dans le root - devrait \u00eatre dans logs/",
+      "files": [
+        "system_verification.log",
+        "backend_test.log",
+        "deepseek_finetune_complete.log"
+      ]
+    },
+    {
+      "severity": "CRITICAL",
+      "type": "missing_dependency",
+      "description": "Package manquant: pytesseract - OCR"
+    },
+    {
+      "severity": "HIGH",
+      "type": "docker_config",
+      "description": "Fichier Docker manquant: Dockerfile - Main Dockerfile"
+    }
+  ],
+  "recommendations": [
+    {
+      "priority": 1,
+      "action": "Installer les d\u00e9pendances manquantes",
+      "command": "cd /home/fvegi/dev/pgi-ia && ./venv_pgi_ia/bin/pip install flask flask-cors pyyaml",
+      "impact": "CRITIQUE - Le syst\u00e8me ne peut pas d\u00e9marrer sans ces packages"
+    },
+    {
+      "priority": 2,
+      "action": "Committer ou stash les changements",
+      "command": "git add . && git commit -m 'feat: Plan integration with zoom/pan'",
+      "impact": "IMPORTANT - Risque de perte de travail"
+    },
+    {
+      "priority": 3,
+      "action": "R\u00e9organiser les fichiers Python",
+      "command": "mkdir -p scripts && mv *.py scripts/ (sauf main.py)",
+      "impact": "MOYEN - Am\u00e9liore la maintenabilit\u00e9"
+    },
+    {
+      "priority": 4,
+      "action": "Cr\u00e9er Dockerfile manquant",
+      "command": "Utiliser docker/backend.Dockerfile comme base",
+      "impact": "MOYEN - N\u00e9cessaire pour Docker"
+    }
+  ],
+  "file_analysis": {},
+  "dependency_status": {
+    "flask": "3.1.1",
+    "flask-cors": "6.0.1",
+    "pyyaml": "6.0.2",
+    "openai": "1.95.1",
+    "torch": "2.7.1",
+    "transformers": "4.53.1",
+    "pdf2image": "1.17.0",
+    "pytesseract": "MISSING"
+  },
+  "docker_status": {
+    "docker-compose.yml": true,
+    "docker-compose.dev.yml": true,
+    "Dockerfile": false,
+    ".dockerignore": false,
+    "docker/backend.Dockerfile": true
+  }
+}

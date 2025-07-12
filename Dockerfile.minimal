@@ -1,0 +1,29 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Install basic dependencies
+RUN apt-get update && apt-get install -y \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install Python packages
+RUN pip install --no-cache-dir \
+    flask \
+    flask-cors \
+    openai \
+    sqlalchemy \
+    python-dotenv \
+    pyyaml \
+    redis
+
+# Copy application
+COPY backend/ ./backend/
+COPY frontend/ ./frontend/
+COPY *.py ./
+
+# Expose port
+EXPOSE 5000
+
+# Run Flask
+CMD ["python", "backend/main.py"]

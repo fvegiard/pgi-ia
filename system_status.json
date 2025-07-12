@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-07-11T16:12:20-04:00",
+  "python_version": "Python 3.12.3",
+  "git_status": {
+    "modified": 20,
+    "untracked": 46,
+    "branch": "main"
+  },
+  "structure": {
+    "backend": true,
+    "frontend": true,
+    "venv": false,
+    "env_file": false
+  }
+}

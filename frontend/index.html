@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PGI-IA : Plateforme de Gestion et d'Orchestration v4.1</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            line-height: 1.25;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+        }
+        .status-estimation { background-color: #FBBF24; color: #1F2937; }
+        .status-construction { background-color: #10B981; color: white; }
+        .status-soumis { background-color: #3B82F6; color: white; }
+        .status-approuve { color: #10B981; border: 2px solid #10B981; background-color: transparent; }
+        .status-a-preparer { color: #FBBF24; border: 2px solid #FBBF24; background-color: transparent; }
+        .status-sans-frais { background-color: #6B7280; color: white; }
+        
+        /* Auto-améliorations UX */
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            text-left;
+            background: none;
+            border: none;
+            border-radius: 0.5rem;
+            color: #9CA3AF;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .nav-btn:hover { background-color: #374151; color: #F3F4F6; }
+        .nav-btn.active { background-color: #1F2937; color: #3B82F6; }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #374151;
+            border-radius: 50%;
+            border-top-color: #3B82F6;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        
+        .sidebar-navigation { padding: 1rem; }
+        
+        /* Mobile responsive fixes */
+        @media (max-width: 640px) {
+            .sidebar-navigation { padding: 0.5rem; }
+            .nav-btn { padding: 0.5rem; font-size: 0.8rem; }
+            .w-80 { width: 100%; }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+    
+    <!-- Toast Success -->
+    <div id="toast-success" class="hidden fixed top-5 right-5 flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
+        <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+        </div>
+        <div class="ml-3 text-sm font-normal" id="toast-message">Action réussie</div>
+    </div>
+
+    <div class="flex h-screen bg-gray-900">
+        
+        <!-- Sidebar Navigation -->
+        <div class="w-80 bg-gray-800 border-r border-gray-700 flex flex-col">
+            <!-- Header -->
+            <div class="p-6 border-b border-gray-700">
+                <h1 class="text-xl font-bold text-white mb-1">PGI-IA</h1>
+                <p class="text-sm text-gray-400">Plateforme de Gestion et d'Orchestration v4.1</p>
+                <div class="mt-3 flex items-center">
+                    <div class="w-2 h-2 bg-green-400 rounded-full mr-2" aria-hidden="true"></div>
+                    <span id="backend-status" class="text-sm text-gray-300">
+                        <span class="loading-spinner mr-2" id="loading-spinner"></span>
+                        Connexion...
+                    </span>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="sidebar-navigation flex-1 p-4" role="navigation" aria-label="Navigation principale">
+                <div class="space-y-2">
+                    <button class="nav-btn active" data-tab="dashboard" aria-label="Aller à la chronologie du projet">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-4m-5 0H9m0 0H5m4 0v-7a1 1 0 011-1h1a1 1 0 011 1v7m-3 0h3m0 0h3M9 7h6m0 0v10"></path>
+                        </svg>
+                        Chronologie
+                    </button>
+                    <button class="nav-btn" data-tab="projects">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                        </svg>
+                        Plans
+                    </button>
+                    <button class="nav-btn" data-tab="directives">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        Directives
+                    </button>
+                    <button class="nav-btn" data-tab="estimations">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                        Estimations
+                    </button>
+                    <button class="nav-btn" data-tab="ai">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+                        </svg>
+                        Orchestration
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Projects Section -->
+            <div class="p-4 border-t border-gray-700">
+                <h3 class="text-sm font-medium text-gray-400 mb-3">Projets Actifs</h3>
+                <div class="space-y-3">
+                    <div class="project-card active" data-project="kahnawake">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm font-medium text-white">S-1086 - Musée Kahnawake</div>
+                                <div class="text-xs text-gray-400">Estimation</div>
+                            </div>
+                            <span class="status-badge status-estimation">Estimation</span>
+                        </div>
+                    </div>
+                    <div class="project-card" data-project="alexis-nihon">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <div class="text-sm font-medium text-white">C-24-048 - Place Alexis-Nihon</div>
+                                <div class="text-xs text-gray-400">Construction</div>
+                            </div>
+                            <span class="status-badge status-construction">Construction</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Drop Zone -->
+            <div class="p-4 border-t border-gray-700">
+                <div class="drop-zone border-2 border-dashed border-gray-600 rounded-lg p-6 text-center hover:border-blue-500 transition-colors cursor-pointer" id="drop-zone">
+                    <svg class="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
+                    </svg>
+                    <div class="text-sm text-gray-400 mb-1">Déposer Fichiers</div>
+                    <div class="text-xs text-gray-500">Projet</div>
+                    <input type="file" id="file-input" accept=".pdf,.jpg,.png" multiple hidden>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            
+            <!-- Top Header -->
+            <div class="bg-gray-800 border-b border-gray-700 p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 id="main-title" class="text-xl font-semibold text-white">S-1086 - Musée Kahnawake</h2>
+                        <p id="main-subtitle" class="text-sm text-gray-400">Tableau de bord central du projet</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button id="save-btn" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg inline-flex items-center text-sm">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Sauvegarder
+                        </button>
+                        <button id="print-btn" class="bg-gray-600 hover:bg-gray-700 text-white font-medium py-2 px-4 rounded-lg inline-flex items-center text-sm">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path>
+                            </svg>
+                            Exporter
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 overflow-auto p-6">
+                
+                <!-- Dashboard/Timeline Tab -->
+                <div id="dashboard" class="tab-content active">
+                    <div class="space-y-6">
+                        
+                        <!-- Summary Cards -->
+                        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                                <h3 class="text-gray-400 text-sm font-medium">Total Extras</h3>
+                                <p id="total-extras" class="text-2xl font-semibold text-green-400 mt-1">$0</p>
+                            </div>
+                            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                                <h3 class="text-gray-400 text-sm font-medium">Total Crédits</h3>
+                                <p id="total-credits" class="text-2xl font-semibold text-red-400 mt-1">$0</p>
+                            </div>
+                            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                                <h3 class="text-gray-400 text-sm font-medium">Impact Net</h3>
+                                <p id="net-impact" class="text-2xl font-semibold text-white mt-1">$0</p>
+                            </div>
+                            <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                                <h3 class="text-gray-400 text-sm font-medium">Directives</h3>
+                                <p id="total-directives" class="text-2xl font-semibold text-blue-400 mt-1">0</p>
+                            </div>
+                        </div>
+
+                        <!-- Timeline -->
+                        <div class="bg-gray-800 rounded-lg shadow-lg p-6">
+                            <div class="flex items-center justify-between mb-6">
+                                <h3 class="text-lg font-semibold text-white">Chronologie du Projet</h3>
+                                <div class="flex items-center space-x-2">
+                                    <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                                    <span class="text-sm text-gray-400">Temps réel</span>
+                                </div>
+                            </div>
+                            <div id="timeline-container" class="space-y-4">
+                                <!-- Timeline items will be populated here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            <!-- Plans Tab -->
+            <div id="projects" class="tab-content">
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-white">Gestion des Plans</h3>
+                        <button class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg text-sm">+ Nouveau Plan</button>
+                    </div>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div class="bg-gray-800 rounded-lg shadow-lg p-6">
+                            <h4 class="text-md font-medium text-white mb-4">Plans Récents</h4>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
+                                    <div class="flex items-center">
+                                        <svg class="w-6 h-6 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                        </svg>
+                                        <div>
+                                            <div class="text-sm font-medium text-white">Plan E-101 Rev A reçu</div>
+                                            <div class="text-xs text-gray-400">Fichier PDF du plan électrique principal déposé.</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs text-gray-400">08:15</span>
+                                </div>
+                                <div class="flex items-center justify-between p-3 bg-gray-700 rounded-lg">
+                                    <div class="flex items-center">
+                                        <svg class="w-6 h-6 text-orange-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        <div>
+                                            <div class="text-sm font-medium text-white">Lancement de l'agent de vectorisation</div>
+                                            <div class="text-xs text-gray-400">L'IA a initié la conversion du plan E-101 en format DWG.</div>
+                                        </div>
+                                    </div>
+                                    <span class="text-xs text-gray-400">08:16</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-800 rounded-lg shadow-lg p-6">
+                            <h4 class="text-md font-medium text-white mb-4">Modèle 3D</h4>
+                            <div class="bg-gray-700 rounded-lg h-48 flex items-center justify-center">
+                                <div class="text-center">
+                                    <svg class="w-12 h-12 mx-auto text-gray-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                    </svg>
+                                    <p class="text-sm text-gray-400">Jumeau Numérique mis à jour</p>
+                                    <p class="text-xs text-gray-500">La géométrie 3D du plan E-101 a été intégrée.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Directives Tab -->
+            <div id="directives" class="tab-content">
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-lg font-semibold text-white">Suivi des Directives</h3>
+                        <button id="add-directive-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg text-sm">+ Nouvelle Directive</button>
+                    </div>
+
+                    <!-- Project Selector -->
+                    <div class="flex items-center space-x-4">
+                        <label class="text-sm font-medium text-gray-300">Projet :</label>
+                        <select id="project-filter" class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <option value="kahnawake">S-1086 - Musée Kahnawake</option>
+                            <option value="alexis-nihon">C-24-048 - Place Alexis-Nihon</option>
+                        </select>
+                        <div class="flex items-center space-x-4 ml-auto">
+                            <input type="text" id="search-input" placeholder="Rechercher..." class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                            <select id="status-filter" class="bg-gray-700 border border-gray-600 rounded-md py-2 px-3 text-white text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                                <option value="all">Tous les statuts</option>
+                                <option value="À préparer">À préparer</option>
+                                <option value="Soumis">Soumis</option>
+                                <option value="Approuvé">Approuvé</option>
+                                <option value="Sans Frais">Sans Frais</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <h4 class="text-gray-400 text-sm font-medium">Total Extras</h4>
+                            <p id="project-total-extras" class="text-xl font-semibold text-green-400 mt-1">$0</p>
+                        </div>
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <h4 class="text-gray-400 text-sm font-medium">Total Crédits</h4>
+                            <p id="project-total-credits" class="text-xl font-semibold text-red-400 mt-1">$0</p>
+                        </div>
+                        <div class="bg-gray-800 p-4 rounded-lg">
+                            <h4 class="text-gray-400 text-sm font-medium">Impact Net</h4>
+                            <p id="project-net-impact" class="text-xl font-semibold text-white mt-1">$0</p>
+                        </div>
+                    </div>
+
+                    <!-- Directives Table -->
+                    <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                        <div class="overflow-x-auto">
+                            <table class="min-w-full divide-y divide-gray-700">
+                                <thead class="bg-gray-700">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider"># Directive</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Date Reçue</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Description</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">PO Client</th>
+                                        <th class="px-4 py-3 text-right text-xs font-medium text-gray-300 uppercase tracking-wider">Prix</th>
+                                        <th class="px-4 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="directives-tbody" class="bg-gray-800 divide-y divide-gray-700">
+                                    <!-- Dynamic content -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Tab -->
+            <div id="ai" class="tab-content">
+                <div class="ai-header">
+                    <h2>🤖 Assistant IA</h2>
+                    <p>Utilisez des commandes naturelles pour gérer vos projets</p>
+                </div>
+                <div class="ai-chat">
+                    <div class="chat-messages" id="chat-messages">
+                        <div class="message ai-message">
+                            <span class="message-sender">Assistant IA</span>
+                            <p>Bonjour ! Comment puis-je vous aider aujourd'hui ?</p>
+                        </div>
+                    </div>
+                    <div class="chat-input">
+                        <input type="text" id="ai-input" placeholder="Tapez votre commande ici... ex: 'Créer un rapport pour Kahnawake'">
+                        <button id="ai-send">Envoyer</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

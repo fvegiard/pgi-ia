@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Upload PGI-IA</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .upload-zone {
+            border: 2px dashed #3B82F6;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            background: #F3F4F6;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .upload-zone:hover {
+            background: #E5E7EB;
+            border-color: #2563EB;
+        }
+        .upload-zone.dragover {
+            background: #DBEAFE;
+            border-color: #1D4ED8;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        button {
+            background: #3B82F6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        button:hover {
+            background: #2563EB;
+        }
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            display: none;
+        }
+        .status.success {
+            background: #D1FAE5;
+            color: #065F46;
+            border: 1px solid #10B981;
+        }
+        .status.error {
+            background: #FEE2E2;
+            color: #991B1B;
+            border: 1px solid #EF4444;
+        }
+        h1 {
+            color: #1F2937;
+        }
+    </style>
+</head>
+<body>
+    <h1>🚀 Test Upload PDF - PGI-IA</h1>
+    
+    <div class="upload-zone" id="uploadZone">
+        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#6B7280" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+            <polyline points="14 2 14 8 20 8"></polyline>
+            <line x1="16" y1="13" x2="8" y2="13"></line>
+            <line x1="16" y1="17" x2="8" y2="17"></line>
+            <polyline points="10 9 9 9 8 9"></polyline>
+        </svg>
+        <h2>Glissez-déposez vos PDFs ici</h2>
+        <p>ou cliquez pour sélectionner</p>
+        <input type="file" id="fileInput" accept=".pdf" multiple>
+        <button onclick="document.getElementById('fileInput').click()">
+            Choisir des fichiers PDF
+        </button>
+    </div>
+    
+    <div id="status" class="status"></div>
+    
+    <script>
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const statusDiv = document.getElementById('status');
+        
+        // Click to upload
+        uploadZone.addEventListener('click', (e) => {
+            if (e.target.tagName !== 'BUTTON') {
+                fileInput.click();
+            }
+        });
+        
+        // Drag and drop
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+        
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+        
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            handleFiles(e.dataTransfer.files);
+        });
+        
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+        
+        // Handle files
+        async function handleFiles(files) {
+            for (const file of files) {
+                if (file.type === 'application/pdf') {
+                    showStatus(`Upload de ${file.name}...`, 'success');
+                    await uploadFile(file);
+                } else {
+                    showStatus(`${file.name} n'est pas un PDF!`, 'error');
+                }
+            }
+        }
+        
+        // Upload file
+        async function uploadFile(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('project_id', 'kahnawake');
+            
+            try {
+                const response = await fetch('http://localhost:5000/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showStatus(`✅ ${file.name} uploadé avec succès!`, 'success');
+                } else {
+                    showStatus(`❌ Erreur upload ${file.name}`, 'error');
+                }
+            } catch (error) {
+                showStatus(`❌ Erreur: ${error.message}`, 'error');
+            }
+        }
+        
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+            statusDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

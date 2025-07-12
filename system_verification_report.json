@@ -1,0 +1,42 @@
+{
+  "timestamp": "2025-07-12T13:45:32.874904",
+  "checks": {
+    "python": {
+      "status": "OK",
+      "version": "3.12.3 (main, Jun 18 2025, 17:59:45) [GCC 13.3.0]",
+      "executable": "/usr/bin/python3"
+    },
+    "structure": {
+      "status": "OK",
+      "missing_dirs": []
+    },
+    "files": {
+      "status": "PARTIAL",
+      "missing_scripts": [
+        "verify_complete_system.py",
+        "audit_deepseek.py",
+        "audit_justina.py",
+        "deepseek_finetune_english_complete.py",
+        "start_all_services.py",
+        "gemini_manager.py",
+        "google_session_manager.py"
+      ],
+      "backend_complete": true
+    },
+    "apis": {
+      "OpenAI": "MISSING",
+      "DeepSeek": "MISSING",
+      "Gemini": "MISSING",
+      "Anthropic": "MISSING"
+    },
+    "dependencies": {
+      "status": "FILE_FOUND"
+    }
+  },
+  "summary": {
+    "total_checks": 5,
+    "passed": 3,
+    "failed": 2,
+    "percentage": 60.0
+  }
+}

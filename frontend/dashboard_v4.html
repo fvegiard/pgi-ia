@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PGI-IA v4.1 - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+    <style>
+        @keyframes pulse-green {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .animate-pulse-green {
+            animation: pulse-green 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <div x-data="pgiDashboard()" x-init="init()" class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-gray-800 border-b border-gray-700">
+            <div class="container mx-auto px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center space-x-4">
+                    <h1 class="text-2xl font-bold text-blue-400">PGI-IA v4.1</h1>
+                    <span class="text-sm text-gray-400">Progiciel de Gestion Intégré - IA</span>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <span x-show="connected" class="flex items-center text-green-400">
+                        <svg class="w-4 h-4 mr-2 animate-pulse-green" fill="currentColor" viewBox="0 0 20 20">
+                            <circle cx="10" cy="10" r="8"/>
+                        </svg>
+                        Connecté
+                    </span>
+                    <span x-show="!connected" class="flex items-center text-red-400">
+                        <svg class="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <circle cx="10" cy="10" r="8"/>
+                        </svg>
+                        Déconnecté
+                    </span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="container mx-auto px-4 py-8">
+            <!-- System Status -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                    <h3 class="text-lg font-semibold mb-4 text-blue-400">APIs Status</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span>DeepSeek</span>
+                            <span :class="systemStatus.apis?.deepseek ? 'text-green-400' : 'text-red-400'">
+                                <span x-text="systemStatus.apis?.deepseek ? '✓ Actif' : '✗ Inactif'"></span>
+                            </span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Gemini</span>
+                            <span :class="systemStatus.apis?.gemini ? 'text-green-400' : 'text-red-400'">
+                                <span x-text="systemStatus.apis?.gemini ? '✓ Actif' : '✗ Inactif'"></span>
+                            </span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Ollama</span>
+                            <span :class="systemStatus.apis?.ollama ? 'text-green-400' : 'text-red-400'">
+                                <span x-text="systemStatus.apis?.ollama ? '✓ Actif' : '✗ Inactif'"></span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                    <h3 class="text-lg font-semibold mb-4 text-blue-400">Projet Kahnawake</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span>Status</span>
+                            <span class="text-green-400">Actif</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>PDFs</span>
+                            <span class="text-white">300+</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Traités</span>
+                            <span class="text-yellow-400">0 / 300</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                    <h3 class="text-lg font-semibold mb-4 text-blue-400">Projet Alexis-Nihon</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between">
+                            <span>Status</span>
+                            <span class="text-green-400">Actif</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Directives</span>
+                            <span class="text-white">5</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Dernière MAJ</span>
+                            <span class="text-gray-400">2025-01-09</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Upload Section -->
+            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700 mb-8">
+                <h3 class="text-lg font-semibold mb-4 text-blue-400">Upload & Traitement</h3>
+                <div class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center">
+                    <input type="file" id="fileInput" @change="handleFileUpload" class="hidden" accept=".pdf,.jpg,.jpeg,.png">
+                    <label for="fileInput" class="cursor-pointer">
+                        <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 48 48">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <p class="text-gray-400">Cliquez pour upload ou glissez un fichier ici</p>
+                        <p class="text-sm text-gray-500 mt-2">PDF, JPG, PNG jusqu'à 100MB</p>
+                    </label>
+                </div>
+                <div x-show="uploadStatus" class="mt-4 p-4 rounded" :class="uploadSuccess ? 'bg-green-900' : 'bg-red-900'">
+                    <p x-text="uploadStatus"></p>
+                </div>
+            </div>
+
+            <!-- Recent Activities -->
+            <div class="bg-gray-800 rounded-lg p-6 border border-gray-700">
+                <h3 class="text-lg font-semibold mb-4 text-blue-400">Activités Récentes</h3>
+                <div class="space-y-3">
+                    <template x-for="activity in activities" :key="activity.id">
+                        <div class="flex items-center justify-between p-3 bg-gray-700 rounded">
+                            <div class="flex items-center space-x-3">
+                                <div class="w-2 h-2 rounded-full" :class="activity.type === 'success' ? 'bg-green-400' : 'bg-yellow-400'"></div>
+                                <span x-text="activity.message"></span>
+                            </div>
+                            <span class="text-sm text-gray-400" x-text="activity.time"></span>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        function pgiDashboard() {
+            return {
+                connected: false,
+                systemStatus: {},
+                activities: [],
+                uploadStatus: '',
+                uploadSuccess: false,
+                apiUrl: 'http://localhost:5001',
+
+                async init() {
+                    await this.checkConnection();
+                    setInterval(() => this.checkConnection(), 5000);
+                },
+
+                async checkConnection() {
+                    try {
+                        const response = await fetch(this.apiUrl + '/');
+                        if (response.ok) {
+                            const data = await response.json();
+                            this.connected = true;
+                            this.systemStatus = data.system || {};
+                        } else {
+                            this.connected = false;
+                        }
+                    } catch (error) {
+                        this.connected = false;
+                    }
+                },
+
+                async handleFileUpload(event) {
+                    const file = event.target.files[0];
+                    if (!file) return;
+
+                    const formData = new FormData();
+                    formData.append('file', file);
+
+                    try {
+                        const response = await fetch(this.apiUrl + '/upload', {
+                            method: 'POST',
+                            body: formData
+                        });
+
+                        const data = await response.json();
+                        if (response.ok) {
+                            this.uploadSuccess = true;
+                            this.uploadStatus = `✅ ${data.status} - ${file.name}`;
+                            this.addActivity('success', `Fichier ${file.name} traité avec succès`);
+                        } else {
+                            this.uploadSuccess = false;
+                            this.uploadStatus = `❌ Erreur: ${data.error}`;
+                        }
+                    } catch (error) {
+                        this.uploadSuccess = false;
+                        this.uploadStatus = `❌ Erreur de connexion`;
+                    }
+
+                    setTimeout(() => {
+                        this.uploadStatus = '';
+                    }, 5000);
+                },
+
+                addActivity(type, message) {
+                    this.activities.unshift({
+                        id: Date.now(),
+                        type: type,
+                        message: message,
+                        time: new Date().toLocaleTimeString()
+                    });
+                    if (this.activities.length > 10) {
+                        this.activities.pop();
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

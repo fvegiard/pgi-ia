@@ -1,0 +1,122 @@
+[
+  {
+    "time": "2025-07-11T23:12:47.001804",
+    "action": "Installation d\u00e9pendances critiques",
+    "status": "\u2705",
+    "details": "Succ\u00e8s"
+  },
+  {
+    "time": "2025-07-11T23:12:47.003573",
+    "action": "Cr\u00e9ation structure de dossiers",
+    "status": "\u2705",
+    "details": ""
+  },
+  {
+    "time": "2025-07-11T23:12:47.010443",
+    "action": "D\u00e9placement des logs",
+    "status": "\u2705",
+    "details": "Succ\u00e8s"
+  },
+  {
+    "time": "2025-07-11T23:12:47.012707",
+    "action": "Organisation scripts analyse",
+    "status": "\u2705",
+    "details": "Succ\u00e8s"
+  },
+  {
+    "time": "2025-07-11T23:12:47.014542",
+    "action": "Organisation scripts test",
+    "status": "\u2705",
+    "details": "Succ\u00e8s"
+  },
+  {
+    "time": "2025-07-11T23:12:47.080336",
+    "action": "Stage fichiers plan",
+    "status": "\u2705",
+    "details": "Succ\u00e8s"
+  },
+  {
+    "time": "2025-07-11T23:12:47.109751",
+    "action": "Commit plan interactif",
+    "status": "\u2705",
+    "details": "Succ\u00e8s"
+  },
+  {
+    "time": "2025-07-11T23:12:47.131280",
+    "action": "Stage tous les changements",
+    "status": "\u2705",
+    "details": "Succ\u00e8s"
+  },
+  {
+    "time": "2025-07-11T23:12:47.141414",
+    "action": "Commit r\u00e9organisation",
+    "status": "\u2705",
+    "details": "Succ\u00e8s"
+  },
+  {
+    "time": "2025-07-11T23:12:47.141707",
+    "action": "Cr\u00e9ation Dockerfile principal",
+    "status": "\u2705",
+    "details": ""
+  },
+  {
+    "time": "2025-07-11T23:12:47.141782",
+    "action": "Cr\u00e9ation .dockerignore",
+    "status": "\u2705",
+    "details": ""
+  },
+  {
+    "time": "2025-07-11T23:12:47.358193",
+    "action": "G\u00e9n\u00e9ration requirements.txt",
+    "status": "\u2705",
+    "details": "Succ\u00e8s"
+  },
+  {
+    "time": "2025-07-11T23:12:47.358879",
+    "action": "PDFs Kahnawake trouv\u00e9s",
+    "status": "\u2705",
+    "details": "0 fichiers"
+  },
+  {
+    "time": "2025-07-11T23:12:47.401168",
+    "action": "Cr\u00e9ation base de donn\u00e9es",
+    "status": "\u2705",
+    "details": "Succ\u00e8s"
+  },
+  {
+    "time": "2025-07-11T23:13:10.530157",
+    "action": "Audit DeepSeek",
+    "status": "\u2705",
+    "details": "Succ\u00e8s"
+  },
+  {
+    "time": "2025-07-11T23:13:10.537941",
+    "action": "Stage tous les fichiers",
+    "status": "\u2705",
+    "details": "Succ\u00e8s"
+  },
+  {
+    "time": "2025-07-11T23:13:10.545116",
+    "action": "Commit final",
+    "status": "\u2705",
+    "details": "Succ\u00e8s"
+  },
+  {
+    "time": "2025-07-11T23:13:12.302671",
+    "action": "Push vers GitHub",
+    "status": "\u2705",
+    "details": "Succ\u00e8s"
+  },
+  {
+    "time": "2025-07-11T23:13:16.072657",
+    "action": "Build Docker images",
+    "status": "\u2705",
+    "details": "Succ\u00e8s"
+  },
+  {
+    "time": "2025-07-11T23:13:17.586300",
+    "action": "Nettoyage cache",
+    "status": "\u2705",
+    "details": "Succ\u00e8s"
+  }
+]

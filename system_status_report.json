@@ -1,0 +1,23 @@
+{
+  "timestamp": "2025-07-12T09:16:05.007472",
+  "status": {
+    "backend": false,
+    "deepseek": true,
+    "gemini": false,
+    "database": true,
+    "gpu": true,
+    "services": {}
+  },
+  "health_check": {
+    "backend": false,
+    "database": true,
+    "gpu": true,
+    "apis": {
+      "deepseek": true,
+      "gemini": false
+    }
+  },
+  "recommendations": [
+    "Configure Gemini API for enhanced PDF analysis"
+  ]
+}

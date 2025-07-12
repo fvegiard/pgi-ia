@@ -73,6 +73,77 @@ def get_documents():
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
+
+@app.route('/api/status', methods=['GET'])
+def get_status():
+    """Get system status and statistics"""
+    try:
+        conn = sqlite3.connect(DATABASE)
+        c = conn.cursor()
+        
+        # Get document count by status
+        c.execute("""SELECT status, COUNT(*) FROM documents GROUP BY status""")
+        status_counts = dict(c.fetchall())
+        
+        # Get total documents
+        c.execute("""SELECT COUNT(*) FROM documents""")
+        total_docs = c.fetchone()[0]
+        
+        # Get project statistics
+        c.execute("""SELECT project_id, COUNT(*) FROM documents GROUP BY project_id""")
+        project_counts = dict(c.fetchall())
+        
+        conn.close()
+        
+        # Check API status
+        api_status = {
+            "openai": bool(os.getenv("OPENAI_API_KEY", "").startswith("sk-")),
+            "deepseek": bool(os.getenv("DEEPSEEK_API_KEY", "").startswith("sk-")),
+            "gemini": bool(os.getenv("GEMINI_API_KEY", "") and "YOUR_" not in os.getenv("GEMINI_API_KEY", "")),
+            "anthropic": bool(os.getenv("ANTHROPIC_API_KEY", "").startswith("sk-"))
+        }
+        
+        # Get GPU status
+        gpu_available = False
+        try:
+            import subprocess
+            result = subprocess.run(["nvidia-smi", "--query-gpu=name", "--format=csv,noheader"], 
+                                  capture_output=True, text=True)
+            if result.returncode == 0:
+                gpu_available = True
+        except:
+            pass
+        
+        status = {
+            "service": "PGI-IA Backend",
+            "version": "4.1",
+            "timestamp": datetime.now().isoformat(),
+            "status": "operational",
+            "statistics": {
+                "total_documents": total_docs,
+                "documents_by_status": status_counts,
+                "documents_by_project": project_counts
+            },
+            "apis": api_status,
+            "gpu_available": gpu_available,
+            "endpoints": [
+                "/health",
+                "/api/status", 
+                "/api/documents",
+                "/api/upload",
+                "/api/analyze"
+            ]
+        }
+        
+        return jsonify(status)
+        
+    except Exception as e:
+        return jsonify({
+            "service": "PGI-IA Backend",
+            "status": "error",
+            "error": str(e)
+        }), 500
+
 @app.route('/')
 def index():
     return jsonify({

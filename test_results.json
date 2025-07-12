@@ -1,0 +1,40 @@
+{
+  "timestamp": "2025-07-12T09:47:35.329718",
+  "tests": {
+    "environment": {
+      "venv": true,
+      "database": true,
+      "uploads_dir": true,
+      "frontend": true,
+      "env_file": true
+    },
+    "gpu": {
+      "available": true,
+      "info": "NVIDIA GeForce RTX 4060 Laptop GPU, 8188 MiB"
+    },
+    "backend": {
+      "/health": true,
+      "/api/documents": true,
+      "/api/status": true
+    },
+    "apis": {
+      "openai": true,
+      "deepseek": true,
+      "gemini": true,
+      "anthropic": true
+    },
+    "database": {
+      "connected": true,
+      "tables": 3,
+      "documents": 51
+    },
+    "services": {
+      "email_watcher": true,
+      "docker": true,
+      "startup_script": true
+    }
+  },
+  "overall_status": "PRODUCTION_READY",
+  "ready_percentage": 100.0,
+  "tests_passed": "20/20"
+}

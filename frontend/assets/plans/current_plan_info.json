@@ -1,0 +1,69 @@
+{
+  "current_plan": {
+    "file": "EC-M-RC01-TELECOM-CONDUITS-PATH---GROUND-LEVEL-Rev.1",
+    "title": "PLAN EC-M-RC01",
+    "description": "Centre Culturel Kahnawake - Conduits Télécom/Chemin de câbles - Rez-de-chaussée Rev.1",
+    "project": "C24-060",
+    "client": "Centre Culturel Kahnawake",
+    "contractor": "Les Entreprises QMD",
+    "date": "16 Juin 2025",
+    "discipline": "Electrical",
+    "extracted": {
+      "png": "assets/plans/EC-M-RC01-TELECOM-CONDUITS-PATH---GROUND-LEVEL-Rev.1_page_1.png",
+      "web_jpg": "assets/plans/EC-M-RC01-TELECOM-CONDUITS-PATH---GROUND-LEVEL-Rev.1_page_1_web.jpg",
+      "dimensions": {
+        "original": {
+          "width": 9362,
+          "height": 6623
+        },
+        "web": {
+          "width": 2000,
+          "height": 1414
+        }
+      }
+    }
+  },
+  "markers": [
+    {
+      "id": 1,
+      "type": "electrical",
+      "x_percent": 25,
+      "y_percent": 30,
+      "title": "Panneaux électriques",
+      "description": "Installation panneaux électriques - Salle mécanique",
+      "status": "active",
+      "color": "blue"
+    },
+    {
+      "id": 2,
+      "type": "photo",
+      "x_percent": 60,
+      "y_percent": 45,
+      "title": "Photo géolocalisée",
+      "description": "Photo: Conduits principaux - 10/07/2025 14:23",
+      "photo_id": "IMG_2025_07_10_142300",
+      "color": "green"
+    },
+    {
+      "id": 3,
+      "type": "issue",
+      "x_percent": 40,
+      "y_percent": 65,
+      "title": "Zone problème",
+      "description": "Conflit: Conduits vs structure acier - 2e étage",
+      "severity": "high",
+      "color": "orange"
+    },
+    {
+      "id": 4,
+      "type": "qrt",
+      "x_percent": 75,
+      "y_percent": 20,
+      "title": "QRT Active",
+      "description": "QRT #361: Luminaire L3 et K - En attente",
+      "qrt_number": "361",
+      "status": "pending",
+      "color": "red"
+    }
+  ]
+}

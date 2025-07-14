@@ -1,0 +1,21 @@
+version: '3.8'
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5001:5000" # Using port 5001 to avoid conflict with the other setup
+    volumes:
+      - ./backend:/app/backend
+      - ./frontend:/app/frontend
+    environment:
+      - FLASK_ENV=development
+      - DEEPSEEK_API_KEY=sk-ccc37a109afb461989af8cf994a8bc60
+
+  frontend:
+    image: nginx:alpine
+    ports:
+      - "8081:80" # Using port 8081 to avoid conflict
+    volumes:
+      - ./frontend:/usr/share/nginx/html

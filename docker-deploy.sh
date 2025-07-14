@@ -10,6 +10,14 @@ if ! command -v docker &> /dev/null; then
     exit 1
 fi
 
+# Vérifier la connexion au démon Docker (permission)
+if ! docker info > /dev/null 2>&1; then
+    echo "⚠️ Impossible de se connecter au démon Docker (permission denied)."
+    echo "→ Sous Linux (systemd) : sudo usermod -aG docker \$USER && sudo systemctl start docker"
+    echo "→ Sous WSL : assurez-vous que l'intégration WSL est activée dans Docker Desktop et relancez Docker Desktop"
+    exit 1
+fi
+
 # Vérifier les clés API
 if [ ! -f .env ]; then
     echo "⚠️ Fichier .env manquant !"

@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    container_name: pgi-ia-backend
+    environment:
+      - FLASK_ENV=production
+      - DATABASE_URL=sqlite:////app/data/pgi_ia.db
+      - DEEPSEEK_API_KEY=${DEEPSEEK_API_KEY:-sk-ccc37a109afb461989af8cf994a8bc60}
+      - LOG_FILE=/app/logs/app.log
+      - UPLOAD_FOLDER=/app/uploads
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+      - ./datasets:/app/datasets
+      - ./models:/app/models
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: pgi-ia-frontend
+    environment:
+      - REACT_APP_API_URL=http://localhost:5000
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  default:
+    name: pgi-ia-network
+
+volumes:
+  pgi-data:
+    driver: local
+  pgi-logs:
+    driver: local
+  pgi-uploads:
+    driver: local

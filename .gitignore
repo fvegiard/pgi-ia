@@ -28,3 +28,59 @@ data/drop_zone/
 
 # Mypy cache
 .mypy_cache/
+
+# Large datasets and JSONL files
+*.jsonl
+datasets/*.jsonl
+datasets/large/
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+data/*.db
+
+# Environment files
+.env
+.env.local
+.env.production
+
+# Python cache
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Virtual environments
+venv_pgi_ia/
+venv*/
+
+# Logs
+logs/
+*.log
+
+# Uploads
+uploads/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~
+
+# Node modules (for frontend)
+node_modules/
+
+# Coverage reports
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+*.cover
+
+# Docker volumes
+docker-volumes/

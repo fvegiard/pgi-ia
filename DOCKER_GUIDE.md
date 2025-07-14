@@ -135,9 +135,15 @@ REDIS_PASSWORD=redis_secure_password
 
 ### "Cannot connect to Docker daemon"
 ```bash
+# Sous Linux (systemd)
 sudo systemctl start docker
 sudo usermod -aG docker $USER
-# Logout/login
+# Se déconnecter/reconnecter (logout/login)
+
+# Sous WSL (Windows)
+# Assurez-vous d'avoir Docker Desktop pour Windows
+# Activez l'intégration WSL dans Docker Desktop Settings
+# Redémarrez Docker Desktop
 ```
 
 ### "GPU not available"

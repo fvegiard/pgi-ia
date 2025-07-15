@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PGI-IA v4.2 - Dashboard 3D</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/DXFLoader.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .sidebar-item.active { background-color: #1e293b; color: #3b82f6; }
+        #viewer3D { width: 100%; height: 100%; min-height: 400px; }
+        .metric-card { @apply bg-white rounded-lg shadow-sm p-6 border border-gray-100; }
+        .glass-effect { backdrop-filter: blur(10px); background: rgba(255, 255, 255, 0.9); }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="w-64 bg-gray-900 text-white flex flex-col">
+            <div class="p-6">
+                <h1 class="text-2xl font-bold">PGI-IA</h1>
+                <p class="text-sm text-gray-400 mt-1">Plateforme de Gestion et d'Orchestration v4.2</p>
+            </div>
+            
+            <nav class="flex-1 px-4">
+                <a href="#dashboard" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg mb-1 hover:bg-gray-800 active">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                    <span>Tableau de bord</span>
+                </a>
+                <a href="#chronologie" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg mb-1 hover:bg-gray-800">
+                    <i data-lucide="clock" class="w-5 h-5"></i>
+                    <span>Chronologie</span>
+                </a>
+                <a href="#plans" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg mb-1 hover:bg-gray-800">
+                    <i data-lucide="map" class="w-5 h-5"></i>
+                    <span>Plans</span>
+                    <span class="ml-auto bg-blue-600 text-xs px-2 py-1 rounded-full">3D</span>
+                </a>
+                <a href="#directives" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg mb-1 hover:bg-gray-800">
+                    <i data-lucide="file-text" class="w-5 h-5"></i>
+                    <span>Directives</span>
+                    <span class="ml-auto bg-orange-600 text-xs px-2 py-1 rounded-full">15</span>
+                </a>
+                <a href="#estimations" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg mb-1 hover:bg-gray-800">
+                    <i data-lucide="calculator" class="w-5 h-5"></i>
+                    <span>Estimations</span>
+                </a>
+                <a href="#orchestration" class="sidebar-item flex items-center gap-3 px-4 py-3 rounded-lg mb-1 hover:bg-gray-800">
+                    <i data-lucide="cpu" class="w-5 h-5"></i>
+                    <span>Orchestration IA</span>
+                </a>
+            </nav>
+            
+            <div class="p-4 border-t border-gray-800">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                        <span class="text-sm font-semibold">FV</span>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium">Francis Végiard</p>
+                        <p class="text-xs text-gray-400">Ingénieur IA</p>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 overflow-auto">
+            <!-- Header -->
+            <header class="bg-white border-b border-gray-200 sticky top-0 z-40">
+                <div class="flex items-center justify-between px-6 py-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">S-1086 - Musée Kahnawake</h2>
+                        <p class="text-sm text-gray-600 mt-1">Tableau de bord central du projet</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <button class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 flex items-center gap-2">
+                            <i data-lucide="save" class="w-4 h-4"></i>
+                            Sauvegarder
+                        </button>
+                        <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
+                            <i data-lucide="upload" class="w-4 h-4"></i>
+                            Exporter
+                        </button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <div id="dashboard" class="p-6">
+                <!-- Metrics Row -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    <div class="metric-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Total Extras</p>
+                                <p class="text-2xl font-bold text-green-600">$168,224.68</p>
+                                <p class="text-xs text-gray-500 mt-1">+12.5% vs budget</p>
+                            </div>
+                            <div class="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="trending-up" class="w-6 h-6 text-green-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Total Crédits</p>
+                                <p class="text-2xl font-bold text-red-600">($389,778.16)</p>
+                                <p class="text-xs text-gray-500 mt-1">-23.1% économies</p>
+                            </div>
+                            <div class="w-12 h-12 bg-red-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="trending-down" class="w-6 h-6 text-red-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Impact Net</p>
+                                <p class="text-2xl font-bold text-blue-600">($221,553.48)</p>
+                                <p class="text-xs text-gray-500 mt-1">Économie totale</p>
+                            </div>
+                            <div class="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="dollar-sign" class="w-6 h-6 text-blue-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="metric-card">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600">Directives</p>
+                                <p class="text-2xl font-bold text-orange-600">15</p>
+                                <p class="text-xs text-gray-500 mt-1">3 en attente</p>
+                            </div>
+                            <div class="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                                <i data-lucide="file-text" class="w-6 h-6 text-orange-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Main Grid -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Left Column - Plans & 3D Viewer -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <!-- Plan Principal avec Viewer 3D -->
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-100">
+                            <div class="p-4 border-b border-gray-100">
+                                <div class="flex items-center justify-between">
+                                    <h3 class="text-lg font-semibold">Plan Principal - Vue 3D</h3>
+                                    <div class="flex items-center gap-2">
+                                        <button onclick="toggleView('2d')" class="px-3 py-1 text-sm bg-gray-100 rounded-lg hover:bg-gray-200">2D</button>
+                                        <button onclick="toggleView('3d')" class="px-3 py-1 text-sm bg-blue-600 text-white rounded-lg">3D</button>
+                                        <button onclick="toggleView('edit')" class="px-3 py-1 text-sm bg-green-600 text-white rounded-lg">Éditer</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="relative h-96">
+                                <div id="viewer3D" class="w-full h-full bg-gray-900"></div>
+                                <div class="absolute bottom-4 left-4 bg-white/90 backdrop-blur rounded-lg p-3 shadow-lg">
+                                    <p class="text-sm font-medium">EC-M-RC01 - Niveau Sol</p>
+                                    <p class="text-xs text-gray-600">Conduits Télécom - Rev.1</p>
+                                </div>
+                                <div class="absolute top-4 right-4 flex flex-col gap-2">
+                                    <button class="p-2 bg-white/90 backdrop-blur rounded-lg shadow-lg hover:bg-white">
+                                        <i data-lucide="zoom-in" class="w-5 h-5"></i>
+                                    </button>
+                                    <button class="p-2 bg-white/90 backdrop-blur rounded-lg shadow-lg hover:bg-white">
+                                        <i data-lucide="zoom-out" class="w-5 h-5"></i>
+                                    </button>
+                                    <button class="p-2 bg-white/90 backdrop-blur rounded-lg shadow-lg hover:bg-white">
+                                        <i data-lucide="maximize-2" class="w-5 h-5"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Upload Zone -->
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                            <h3 class="text-lg font-semibold mb-4">Importer Plans</h3>
+                            <div id="uploadZone" class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
+                                <i data-lucide="cloud-upload" class="w-12 h-12 mx-auto text-gray-400 mb-4"></i>
+                                <p class="text-sm text-gray-600 mb-2">Glissez vos fichiers PDF, DWG ou DXF ici</p>
+                                <p class="text-xs text-gray-500 mb-4">ou</p>
+                                <button id="selectFiles" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                                    Sélectionner fichiers
+                                </button>
+                                <input type="file" id="fileInput" multiple accept=".pdf,.dwg,.dxf" class="hidden">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column - Timeline & Activity -->
+                    <div class="space-y-6">
+                        <!-- Chronologie du Projet -->
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-lg font-semibold">Chronologie du Projet</h3>
+                                <button class="text-sm text-blue-600 hover:text-blue-700">Voir tout</button>
+                            </div>
+                            <canvas id="timelineChart" width="400" height="200"></canvas>
+                        </div>
+
+                        <!-- Activité Récente -->
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                            <h3 class="text-lg font-semibold mb-4">Activité Récente</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <i data-lucide="check" class="w-4 h-4 text-green-600"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium">Plan E-101 Rev A approuvé</p>
+                                        <p class="text-xs text-gray-500">Il y a 2 heures</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <i data-lucide="file-plus" class="w-4 h-4 text-blue-600"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium">Nouvelle directive CO-ME-28</p>
+                                        <p class="text-xs text-gray-500">Il y a 5 heures</p>
+                                    </div>
+                                </div>
+                                <div class="flex items-start gap-3">
+                                    <div class="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+                                        <i data-lucide="alert-circle" class="w-4 h-4 text-orange-600"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <p class="text-sm font-medium">Modification conduits niveau 2</p>
+                                        <p class="text-xs text-gray-500">Hier</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- IA Status -->
+                        <div class="bg-white rounded-lg shadow-sm border border-gray-100 p-6">
+                            <h3 class="text-lg font-semibold mb-4">Orchestration IA</h3>
+                            <div class="space-y-3">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                        <span class="text-sm">DeepSeek API</span>
+                                    </div>
+                                    <span class="text-xs text-green-600">Actif</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                        <span class="text-sm">Conversion PDF→CAD</span>
+                                    </div>
+                                    <span class="text-xs text-green-600">Prêt</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                                        <span class="text-sm">Moteur 3D</span>
+                                    </div>
+                                    <span class="text-xs text-yellow-600">Initialisation</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // 3D Viewer Setup
+        let scene, camera, renderer, controls;
+        let currentView = '3d';
+
+        function init3DViewer() {
+            const container = document.getElementById('viewer3D');
+            
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x1a1a2e);
+            scene.fog = new THREE.Fog(0x1a1a2e, 100, 1000);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(
+                75,
+                container.clientWidth / container.clientHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(50, 50, 50);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.shadowMap.enabled = true;
+            container.appendChild(renderer.domElement);
+
+            // Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(50, 100, 50);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+
+            // Grid Helper
+            const gridHelper = new THREE.GridHelper(100, 20, 0x444444, 0x222222);
+            scene.add(gridHelper);
+
+            // Demo Building Structure
+            createDemoBuilding();
+
+            // Animation loop
+            animate();
+
+            // Handle resize
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function createDemoBuilding() {
+            // Base floor
+            const floorGeometry = new THREE.BoxGeometry(60, 0.5, 40);
+            const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x808080 });
+            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            floor.position.y = -0.25;
+            floor.receiveShadow = true;
+            scene.add(floor);
+
+            // Walls
+            const wallMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0xcccccc,
+                transparent: true,
+                opacity: 0.3
+            });
+
+            // Create walls
+            const walls = [
+                { size: [60, 20, 0.5], pos: [0, 10, -20] },
+                { size: [60, 20, 0.5], pos: [0, 10, 20] },
+                { size: [0.5, 20, 40], pos: [-30, 10, 0] },
+                { size: [0.5, 20, 40], pos: [30, 10, 0] }
+            ];
+
+            walls.forEach(wall => {
+                const geometry = new THREE.BoxGeometry(...wall.size);
+                const mesh = new THREE.Mesh(geometry, wallMaterial);
+                mesh.position.set(...wall.pos);
+                mesh.castShadow = true;
+                scene.add(mesh);
+            });
+
+            // Demo Pipes/Conduits
+            createConduits();
+        }
+
+        function createConduits() {
+            const conduitMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x0066cc,
+                metalness: 0.8,
+                roughness: 0.2
+            });
+
+            // Main conduit path
+            const points = [
+                new THREE.Vector3(-20, 5, 0),
+                new THREE.Vector3(-10, 5, 0),
+                new THREE.Vector3(0, 5, -10),
+                new THREE.Vector3(10, 5, -10),
+                new THREE.Vector3(20, 5, 0)
+            ];
+
+            const curve = new THREE.CatmullRomCurve3(points);
+            const tubeGeometry = new THREE.TubeGeometry(curve, 50, 1, 8, false);
+            const conduit = new THREE.Mesh(tubeGeometry, conduitMaterial);
+            scene.add(conduit);
+
+            // Junction boxes
+            points.forEach(point => {
+                const boxGeometry = new THREE.BoxGeometry(3, 3, 3);
+                const boxMaterial = new THREE.MeshStandardMaterial({ color: 0xff6600 });
+                const box = new THREE.Mesh(boxGeometry, boxMaterial);
+                box.position.copy(point);
+                scene.add(box);
+            });
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('viewer3D');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        function toggleView(view) {
+            currentView = view;
+            if (view === 'edit') {
+                alert('Mode édition: Cliquez sur les éléments pour ajouter des canalisations');
+            }
+        }
+
+        // Timeline Chart
+        function createTimelineChart() {
+            const ctx = document.getElementById('timelineChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
+                    datasets: [{
+                        label: 'Progression',
+                        data: [0, 15, 25, 40, 55, 70, 85],
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // File Upload Handler
+        const fileInput = document.getElementById('fileInput');
+        const uploadZone = document.getElementById('uploadZone');
+        const selectFilesBtn = document.getElementById('selectFiles');
+
+        selectFilesBtn?.addEventListener('click', () => fileInput.click());
+
+        fileInput?.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        uploadZone?.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('border-blue-500', 'bg-blue-50');
+        });
+
+        uploadZone?.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('border-blue-500', 'bg-blue-50');
+        });
+
+        uploadZone?.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('border-blue-500', 'bg-blue-50');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        async function handleFiles(files) {
+            for (const file of files) {
+                console.log(`Processing ${file.name} (${file.type})`);
+                // Here we'll add PDF to CAD conversion
+                if (file.name.endsWith('.dxf') || file.name.endsWith('.dwg')) {
+                    loadCADFile(file);
+                }
+            }
+        }
+
+        async function loadCADFile(file) {
+            // Placeholder for CAD file loading
+            alert(`Chargement du fichier CAD: ${file.name}`);
+        }
+
+        // Navigation
+        document.querySelectorAll('.sidebar-item').forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                document.querySelectorAll('.sidebar-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+            });
+        });
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            init3DViewer();
+            createTimelineChart();
+        });
+    </script>
+</body>
+</html>

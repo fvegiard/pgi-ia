@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  ia_analyst:
+    build:
+      context: ./ia_analyst
+      dockerfile: Dockerfile
+    container_name: pgi-ia-analyst
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OLLAMA_ENDPOINT=${OLLAMA_ENDPOINT}
+      - OLLAMA_MODEL=${OLLAMA_MODEL}
+    volumes:
+      - ./ia_analyst:/app
+      - ./data_to_analyze:/data:ro
+    command: ["python", "main.py"]
+    restart: "no"

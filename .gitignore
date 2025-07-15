@@ -18,6 +18,7 @@ config/agents.yaml
 
 # Data folders
 data/drop_zone/
+/data_to_analyze/
 
 # IDEs and editors
 .vscode/

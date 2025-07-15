@@ -1,0 +1,771 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PGI-IA v4.3 - Dashboard Unifié 3D</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/examples/js/loaders/DXFLoader.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            line-height: 1.25;
+            text-align: center;
+            white-space: nowrap;
+            vertical-align: baseline;
+        }
+        .status-estimation { background-color: #FBBF24; color: #1F2937; }
+        .status-construction { background-color: #10B981; color: white; }
+        .status-soumis { background-color: #3B82F6; color: white; }
+        .status-approuve { color: #10B981; border: 2px solid #10B981; background-color: transparent; }
+        
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 0.75rem 1rem;
+            text-left;
+            background: none;
+            border: none;
+            border-radius: 0.5rem;
+            color: #9CA3AF;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+        .nav-btn:hover { background-color: #374151; color: #F3F4F6; }
+        .nav-btn.active { background-color: #1F2937; color: #3B82F6; }
+        
+        #viewer3D { width: 100%; height: 100%; min-height: 500px; }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 1rem;
+            height: 1rem;
+            border: 2px solid #374151;
+            border-radius: 50%;
+            border-top-color: #3B82F6;
+            animation: spin 1s ease-in-out infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-200">
+    <div class="flex h-screen bg-gray-900">
+        
+        <!-- Sidebar Navigation (from pgi-ia-frontend) -->
+        <div class="w-80 bg-gray-800 border-r border-gray-700 flex flex-col">
+            <!-- Header -->
+            <div class="p-6 border-b border-gray-700">
+                <h1 class="text-xl font-bold text-white mb-1">PGI-IA</h1>
+                <p class="text-sm text-gray-400">Plateforme de Gestion et d'Orchestration v4.3</p>
+                <div class="mt-3 flex items-center">
+                    <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+                    <span id="backend-status" class="text-sm text-gray-300">
+                        <span class="loading-spinner mr-2"></span>
+                        Connexion...
+                    </span>
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="flex-1 p-4">
+                <div class="space-y-2">
+                    <button class="nav-btn active" data-tab="dashboard">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                        </svg>
+                        <span>Tableau de bord</span>
+                    </button>
+                    <button class="nav-btn" data-tab="chronologie">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                        <span>Chronologie du Projet</span>
+                    </button>
+                    <button class="nav-btn" data-tab="gestion-plans">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path>
+                        </svg>
+                        <span>Gestion des Plans</span>
+                        <span class="ml-auto bg-blue-600 text-xs px-2 py-1 rounded-full">3D</span>
+                    </button>
+                    <button class="nav-btn" data-tab="directives">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                        <span>Directives</span>
+                        <span id="directives-count" class="ml-auto bg-orange-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">15</span>
+                    </button>
+                    <button class="nav-btn" data-tab="documents">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Documents</span>
+                        <span id="documents-count" class="ml-auto bg-gray-600 text-white text-xs font-bold px-2 py-0.5 rounded-full">3,247</span>
+                    </button>
+                    <button class="nav-btn" data-tab="photos">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Photos de terrain</span>
+                    </button>
+                    <button class="nav-btn" data-tab="analyses">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                        </svg>
+                        <span>Analyses IA</span>
+                        <span id="analyses-count" class="ml-auto bg-purple-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">1,247</span>
+                    </button>
+                    <button class="nav-btn" data-tab="estimations">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
+                        </svg>
+                        <span>Estimations</span>
+                    </button>
+                </div>
+            </nav>
+
+            <!-- Projects Section -->
+            <div class="p-4 border-t border-gray-700">
+                <h3 class="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Projets Actifs</h3>
+                <div class="space-y-1">
+                    <div class="text-sm flex items-center justify-between py-1">
+                        <span>S-1086 - Musée Kahnawake</span>
+                        <span class="status-badge status-estimation">Estimation</span>
+                    </div>
+                    <div class="text-sm flex items-center justify-between py-1">
+                        <span>C-24-048 - Place Alexis-Nihon</span>
+                        <span class="status-badge status-construction">Construction</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <!-- Top Header -->
+            <div class="bg-gray-800 border-b border-gray-700 p-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h2 id="main-title" class="text-xl font-semibold text-white">S-1086 - Musée Kahnawake</h2>
+                        <p id="main-subtitle" class="text-sm text-gray-400">Tableau de bord central du projet</p>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <button id="save-btn" class="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-4 rounded-lg inline-flex items-center text-sm">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                            </svg>
+                            Sauvegarder
+                        </button>
+                        <button id="export-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg inline-flex items-center text-sm">
+                            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                            </svg>
+                            Exporter
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="flex-1 overflow-y-auto bg-gray-900">
+                <!-- Dashboard Tab (default) -->
+                <div id="dashboard" class="p-6 tab-content">
+                    <!-- Summary Cards from pgi-ia-frontend -->
+                    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-gray-400 text-sm font-medium">Total Extras</h3>
+                            <p id="total-extras" class="text-2xl font-semibold text-green-400 mt-1">$168,224.68</p>
+                            <p class="text-xs text-gray-500 mt-1">+12.5% vs budget</p>
+                        </div>
+                        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-gray-400 text-sm font-medium">Total Crédits</h3>
+                            <p id="total-credits" class="text-2xl font-semibold text-red-400 mt-1">($389,778.16)</p>
+                            <p class="text-xs text-gray-500 mt-1">-23.1% économies</p>
+                        </div>
+                        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-gray-400 text-sm font-medium">Impact Net</h3>
+                            <p id="impact-net" class="text-2xl font-semibold text-blue-400 mt-1">($221,553.48)</p>
+                            <p class="text-xs text-gray-500 mt-1">Économie totale</p>
+                        </div>
+                        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-gray-400 text-sm font-medium">Directives</h3>
+                            <p id="directives-total" class="text-2xl font-semibold text-orange-400 mt-1">15</p>
+                            <p class="text-xs text-gray-500 mt-1">3 en attente</p>
+                        </div>
+                    </div>
+
+                    <!-- Charts Row -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-lg font-semibold text-white mb-4">Chronologie du Projet</h3>
+                            <canvas id="timelineChart" width="400" height="200"></canvas>
+                        </div>
+                        <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <h3 class="text-lg font-semibold text-white mb-4">Répartition des Directives</h3>
+                            <canvas id="directivesChart" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity from dashboard v2 -->
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg">
+                        <h3 class="text-lg font-semibold text-white mb-4">Activité Récente</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 bg-green-600 bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="check" class="w-4 h-4 text-green-400"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-200">Plan E-101 Rev A approuvé</p>
+                                    <p class="text-xs text-gray-500">Il y a 2 heures - Conversion 3D complétée</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 bg-blue-600 bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="file-plus" class="w-4 h-4 text-blue-400"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-200">Nouvelle directive CO-ME-28</p>
+                                    <p class="text-xs text-gray-500">Il y a 5 heures - Impact: $15,430</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start gap-3">
+                                <div class="w-8 h-8 bg-orange-600 bg-opacity-20 rounded-full flex items-center justify-center flex-shrink-0">
+                                    <i data-lucide="alert-circle" class="w-4 h-4 text-orange-400"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <p class="text-sm font-medium text-gray-200">Modification conduits niveau 2</p>
+                                    <p class="text-xs text-gray-500">Hier - En attente d'approbation</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gestion des Plans Tab with 3D Viewer -->
+                <div id="gestion-plans" class="p-6 tab-content hidden">
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <!-- Left: 3D Viewer -->
+                        <div class="lg:col-span-2">
+                            <div class="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
+                                <div class="p-4 border-b border-gray-700">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-lg font-semibold text-white">Visualiseur 3D - Plan Principal</h3>
+                                        <div class="flex items-center gap-2">
+                                            <button onclick="toggleView('2d')" class="px-3 py-1 text-sm bg-gray-700 text-gray-300 rounded hover:bg-gray-600">2D</button>
+                                            <button onclick="toggleView('3d')" class="px-3 py-1 text-sm bg-blue-600 text-white rounded">3D</button>
+                                            <button onclick="toggleView('edit')" class="px-3 py-1 text-sm bg-green-600 text-white rounded">Éditer</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="relative h-96">
+                                    <div id="viewer3D" class="w-full h-full bg-gray-900"></div>
+                                    <div class="absolute bottom-4 left-4 bg-gray-800 bg-opacity-90 backdrop-blur rounded-lg p-3 shadow-lg">
+                                        <p class="text-sm font-medium text-white">EC-M-RC01 - Niveau Sol</p>
+                                        <p class="text-xs text-gray-400">Conduits Télécom - Rev.1</p>
+                                    </div>
+                                    <div class="absolute top-4 right-4 flex flex-col gap-2">
+                                        <button class="p-2 bg-gray-800 bg-opacity-90 backdrop-blur rounded shadow-lg hover:bg-gray-700">
+                                            <i data-lucide="zoom-in" class="w-5 h-5"></i>
+                                        </button>
+                                        <button class="p-2 bg-gray-800 bg-opacity-90 backdrop-blur rounded shadow-lg hover:bg-gray-700">
+                                            <i data-lucide="zoom-out" class="w-5 h-5"></i>
+                                        </button>
+                                        <button class="p-2 bg-gray-800 bg-opacity-90 backdrop-blur rounded shadow-lg hover:bg-gray-700">
+                                            <i data-lucide="maximize-2" class="w-5 h-5"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Upload Zone from dashboard v2 -->
+                            <div class="mt-6 bg-gray-800 rounded-lg shadow-lg p-6">
+                                <h3 class="text-lg font-semibold text-white mb-4">Importer Plans</h3>
+                                <div id="uploadZone" class="border-2 border-dashed border-gray-600 rounded-lg p-8 text-center hover:border-blue-500 transition-colors">
+                                    <i data-lucide="cloud-upload" class="w-12 h-12 mx-auto text-gray-500 mb-4"></i>
+                                    <p class="text-sm text-gray-400 mb-2">Glissez vos fichiers PDF, DWG ou DXF ici</p>
+                                    <p class="text-xs text-gray-500 mb-4">ou</p>
+                                    <button id="selectFiles" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                        Sélectionner fichiers
+                                    </button>
+                                    <input type="file" id="fileInput" multiple accept=".pdf,.dwg,.dxf" class="hidden">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Right: Plans List -->
+                        <div class="space-y-6">
+                            <div class="bg-gray-800 rounded-lg shadow-lg p-6">
+                                <h3 class="text-lg font-semibold text-white mb-4">Plans Récents</h3>
+                                <div class="space-y-3">
+                                    <div class="p-3 bg-gray-700 rounded hover:bg-gray-600 cursor-pointer">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-sm font-medium text-white">Plan E-101 Rev A</p>
+                                                <p class="text-xs text-gray-400">Fichier PDF du plan électrique déposé</p>
+                                            </div>
+                                            <span class="text-xs text-gray-500">08:15</span>
+                                        </div>
+                                    </div>
+                                    <div class="p-3 bg-gray-700 rounded hover:bg-gray-600 cursor-pointer">
+                                        <div class="flex items-center justify-between">
+                                            <div>
+                                                <p class="text-sm font-medium text-white">Lancement de l'agent de vectorisation</p>
+                                                <p class="text-xs text-gray-400">IA a initié la conversion du plan E-101 en format DWG</p>
+                                            </div>
+                                            <span class="text-xs text-gray-500">08:16</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- AI Status -->
+                            <div class="bg-gray-800 rounded-lg shadow-lg p-6">
+                                <h3 class="text-lg font-semibold text-white mb-4">Status Conversion IA</h3>
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                            <span class="text-sm text-gray-300">DeepSeek API</span>
+                                        </div>
+                                        <span class="text-xs text-green-500">Actif</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                                            <span class="text-sm text-gray-300">Conversion PDF→CAD</span>
+                                        </div>
+                                        <span class="text-xs text-green-500">Prêt</span>
+                                    </div>
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-2">
+                                            <div class="w-2 h-2 bg-yellow-500 rounded-full"></div>
+                                            <span class="text-sm text-gray-300">Moteur 3D</span>
+                                        </div>
+                                        <span class="text-xs text-yellow-500">Initialisation</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Directives Tab (from original dashboard.html) -->
+                <div id="directives" class="p-6 tab-content hidden">
+                    <div class="bg-gray-800 rounded-lg shadow-lg p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h2 class="text-2xl font-bold text-white">Directives reçues & QRT</h2>
+                            <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+                                + Nouvelle Directive
+                            </button>
+                        </div>
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left">
+                                <thead>
+                                    <tr class="border-b border-gray-700">
+                                        <th class="py-3 px-4 text-sm font-medium text-gray-400">Date</th>
+                                        <th class="py-3 px-4 text-sm font-medium text-gray-400">Type</th>
+                                        <th class="py-3 px-4 text-sm font-medium text-gray-400">Description</th>
+                                        <th class="py-3 px-4 text-sm font-medium text-gray-400">Impact</th>
+                                        <th class="py-3 px-4 text-sm font-medium text-gray-400">Statut</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="border-b border-gray-700 hover:bg-gray-700">
+                                        <td class="py-3 px-4 text-sm">2025-07-10</td>
+                                        <td class="py-3 px-4 text-sm">CO-ME-28</td>
+                                        <td class="py-3 px-4 text-sm">Modification conduits télécom niveau 2</td>
+                                        <td class="py-3 px-4 text-sm text-green-400">+$15,430</td>
+                                        <td class="py-3 px-4"><span class="status-badge status-approuve">Approuvé</span></td>
+                                    </tr>
+                                    <tr class="border-b border-gray-700 hover:bg-gray-700">
+                                        <td class="py-3 px-4 text-sm">2025-07-08</td>
+                                        <td class="py-3 px-4 text-sm">CO-EL-15</td>
+                                        <td class="py-3 px-4 text-sm">Ajout panneau électrique 600A</td>
+                                        <td class="py-3 px-4 text-sm text-red-400">-$8,200</td>
+                                        <td class="py-3 px-4"><span class="status-badge status-soumis">Soumis</span></td>
+                                    </tr>
+                                    <tr class="border-b border-gray-700 hover:bg-gray-700">
+                                        <td class="py-3 px-4 text-sm">2025-07-05</td>
+                                        <td class="py-3 px-4 text-sm">CO-ST-09</td>
+                                        <td class="py-3 px-4 text-sm">Renforcement structure mezzanine</td>
+                                        <td class="py-3 px-4 text-sm text-green-400">+$22,100</td>
+                                        <td class="py-3 px-4"><span class="status-badge status-estimation">En cours</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-success" class="hidden fixed top-5 right-5 flex items-center w-full max-w-xs p-4 mb-4 text-gray-500 bg-white rounded-lg shadow dark:text-gray-400 dark:bg-gray-800" role="alert">
+        <div class="inline-flex items-center justify-center flex-shrink-0 w-8 h-8 text-green-500 bg-green-100 rounded-lg dark:bg-green-800 dark:text-green-200">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+        </div>
+        <div class="ml-3 text-sm font-normal" id="toast-message">Action réussie</div>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Tab Navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+                
+                // Update active nav button
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show/hide tab content
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                const activeTab = document.getElementById(tabName);
+                if (activeTab) {
+                    activeTab.classList.remove('hidden');
+                    
+                    // Initialize 3D viewer when showing plans tab
+                    if (tabName === 'gestion-plans' && !window.viewer3DInitialized) {
+                        init3DViewer();
+                        window.viewer3DInitialized = true;
+                    }
+                }
+            });
+        });
+
+        // 3D Viewer Setup
+        let scene, camera, renderer, controls;
+        let currentView = '3d';
+
+        function init3DViewer() {
+            const container = document.getElementById('viewer3D');
+            
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x0f172a);
+            scene.fog = new THREE.Fog(0x0f172a, 100, 1000);
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(
+                75,
+                container.clientWidth / container.clientHeight,
+                0.1,
+                1000
+            );
+            camera.position.set(50, 50, 50);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.shadowMap.enabled = true;
+            container.appendChild(renderer.domElement);
+
+            // Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+
+            // Lights
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            scene.add(ambientLight);
+
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(50, 100, 50);
+            directionalLight.castShadow = true;
+            scene.add(directionalLight);
+
+            // Grid Helper
+            const gridHelper = new THREE.GridHelper(100, 20, 0x444444, 0x222222);
+            scene.add(gridHelper);
+
+            // Demo Building Structure
+            createDemoBuilding();
+
+            // Animation loop
+            animate();
+
+            // Handle resize
+            window.addEventListener('resize', onWindowResize);
+        }
+
+        function createDemoBuilding() {
+            // Base floor
+            const floorGeometry = new THREE.BoxGeometry(60, 0.5, 40);
+            const floorMaterial = new THREE.MeshStandardMaterial({ color: 0x4b5563 });
+            const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+            floor.position.y = -0.25;
+            floor.receiveShadow = true;
+            scene.add(floor);
+
+            // Walls
+            const wallMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x9ca3af,
+                transparent: true,
+                opacity: 0.3
+            });
+
+            // Create walls
+            const walls = [
+                { size: [60, 20, 0.5], pos: [0, 10, -20] },
+                { size: [60, 20, 0.5], pos: [0, 10, 20] },
+                { size: [0.5, 20, 40], pos: [-30, 10, 0] },
+                { size: [0.5, 20, 40], pos: [30, 10, 0] }
+            ];
+
+            walls.forEach(wall => {
+                const geometry = new THREE.BoxGeometry(...wall.size);
+                const mesh = new THREE.Mesh(geometry, wallMaterial);
+                mesh.position.set(...wall.pos);
+                mesh.castShadow = true;
+                scene.add(mesh);
+            });
+
+            // Demo Conduits
+            createConduits();
+        }
+
+        function createConduits() {
+            const conduitMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x3b82f6,
+                metalness: 0.8,
+                roughness: 0.2
+            });
+
+            // Main conduit path
+            const points = [
+                new THREE.Vector3(-20, 5, 0),
+                new THREE.Vector3(-10, 5, 0),
+                new THREE.Vector3(0, 5, -10),
+                new THREE.Vector3(10, 5, -10),
+                new THREE.Vector3(20, 5, 0)
+            ];
+
+            const curve = new THREE.CatmullRomCurve3(points);
+            const tubeGeometry = new THREE.TubeGeometry(curve, 50, 1, 8, false);
+            const conduit = new THREE.Mesh(tubeGeometry, conduitMaterial);
+            scene.add(conduit);
+
+            // Junction boxes
+            points.forEach(point => {
+                const boxGeometry = new THREE.BoxGeometry(3, 3, 3);
+                const boxMaterial = new THREE.MeshStandardMaterial({ color: 0xf97316 });
+                const box = new THREE.Mesh(boxGeometry, boxMaterial);
+                box.position.copy(point);
+                scene.add(box);
+            });
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            const container = document.getElementById('viewer3D');
+            camera.aspect = container.clientWidth / container.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+
+        function toggleView(view) {
+            currentView = view;
+            if (view === 'edit') {
+                showToast('Mode édition: Cliquez pour ajouter des canalisations');
+            }
+        }
+
+        // Timeline Chart
+        function createTimelineChart() {
+            const ctx = document.getElementById('timelineChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Juin', 'Juil'],
+                    datasets: [{
+                        label: 'Progression',
+                        data: [0, 15, 25, 40, 55, 70, 85],
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100,
+                            ticks: {
+                                callback: function(value) {
+                                    return value + '%';
+                                },
+                                color: '#9CA3AF'
+                            },
+                            grid: {
+                                color: '#374151'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                color: '#9CA3AF'
+                            },
+                            grid: {
+                                color: '#374151'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Directives Chart
+        function createDirectivesChart() {
+            const ctx = document.getElementById('directivesChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Approuvées', 'En cours', 'Soumises', 'En attente'],
+                    datasets: [{
+                        data: [8, 3, 2, 2],
+                        backgroundColor: [
+                            'rgba(16, 185, 129, 0.8)',
+                            'rgba(251, 191, 36, 0.8)',
+                            'rgba(59, 130, 246, 0.8)',
+                            'rgba(107, 114, 128, 0.8)'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#9CA3AF',
+                                padding: 15
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // File Upload Handler
+        const fileInput = document.getElementById('fileInput');
+        const uploadZone = document.getElementById('uploadZone');
+        const selectFilesBtn = document.getElementById('selectFiles');
+
+        selectFilesBtn?.addEventListener('click', () => fileInput.click());
+
+        fileInput?.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+
+        uploadZone?.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('border-blue-500', 'bg-blue-900', 'bg-opacity-10');
+        });
+
+        uploadZone?.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('border-blue-500', 'bg-blue-900', 'bg-opacity-10');
+        });
+
+        uploadZone?.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('border-blue-500', 'bg-blue-900', 'bg-opacity-10');
+            handleFiles(e.dataTransfer.files);
+        });
+
+        async function handleFiles(files) {
+            for (const file of files) {
+                console.log(`Processing ${file.name} (${file.type})`);
+                showToast(`Upload de ${file.name} en cours...`);
+                
+                // Simulate processing
+                setTimeout(() => {
+                    if (file.name.endsWith('.dxf') || file.name.endsWith('.dwg')) {
+                        showToast(`Fichier CAD ${file.name} chargé avec succès`);
+                    } else if (file.name.endsWith('.pdf')) {
+                        showToast(`Conversion PDF→CAD de ${file.name} démarrée`);
+                    }
+                }, 2000);
+            }
+        }
+
+        // Toast notification
+        function showToast(message) {
+            const toast = document.getElementById('toast-success');
+            const toastMessage = document.getElementById('toast-message');
+            toastMessage.textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3000);
+        }
+
+        // Backend Status Check
+        async function checkBackendStatus() {
+            const statusEl = document.getElementById('backend-status');
+            try {
+                const response = await fetch('http://localhost:5000/api/status');
+                if (response.ok) {
+                    statusEl.innerHTML = '<span class="text-green-400">Backend connecté</span>';
+                } else {
+                    statusEl.innerHTML = '<span class="text-red-400">Backend hors ligne</span>';
+                }
+            } catch (error) {
+                statusEl.innerHTML = '<span class="text-red-400">Backend hors ligne</span>';
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            createTimelineChart();
+            createDirectivesChart();
+            checkBackendStatus();
+            
+            // Check backend status every 30 seconds
+            setInterval(checkBackendStatus, 30000);
+        });
+
+        // Button actions
+        document.getElementById('save-btn')?.addEventListener('click', () => {
+            showToast('Projet sauvegardé avec succès');
+        });
+
+        document.getElementById('export-btn')?.addEventListener('click', () => {
+            showToast('Export du projet démarré');
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,10 @@
+langchain
+llama-index
+sentence-transformers
+faiss-cpu
+chromadb
+pandas
+numpy
+openai
+ollama
+requests

@@ -12,25 +12,14 @@
 - **Framework ML/AI**: PyTorch, Transformers, PEFT
 - **Environnement virtuel**: `/home/fvegi/dev/pgi-ia/venv_pgi_ia/`
 
-## APIs configurées (MIS À JOUR 11/07/2025)
+## APIs configurées (MIS À JOUR 15/07/2025)
 - **DeepSeek API**: ✅ Configurée et fonctionnelle (sk-ccc37a109afb461989af8cf994a8bc60)
-- **Gemini API**: 🆕 Intégration créée, clé à configurer
-- **Google Session**: 🆕 Manager créé (cookies navigateur)
-- **OpenAI API**: ❌ Non trouvée
-- **Anthropic API**: ❌ Non trouvée
+- **Autres APIs**: ❌ Supprimées - Focus DeepSeek uniquement
 
-## Nouveaux outils créés cette session
-### 🤖 Gemini Integration
-- `gemini_manager.py` - Gestionnaire principal
-- `gemini_pgi_integration.py` - Analyse PDF spécialisée
-- `setup_gemini.sh` - Configuration automatique
-- `gemini_integration_launcher.sh` - Menu interactif
-
-### 🔐 Google Session Manager
-- `google_session_manager.py` - Gestion cookies
-- `setup_google_session.py` - Configuration
-- `google_pgi_integration.py` - Accès Drive/Gmail
-- `google_session_launcher.sh` - Menu
+## Configuration simplifiée
+- **API unique**: DeepSeek pour analyse et IA
+- **Focus**: Performance et stabilité
+- **Supprimé**: Intégrations Gemini/Google/OpenAI/Anthropic
 
 ### 🐳 Docker Architecture
 - `docker-compose.yml` - Production

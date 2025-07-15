@@ -51,6 +51,14 @@ cd /home/fvegi/dev/pgi-ia
 docker compose up -d
 ```
 
+### 🚧 Pipeline IA Analyst
+
+Pour lancer le pipeline d'analyse de données :
+
+```bash
+docker compose -f docker-compose.yml -f docker-compose.ia_analyst.yml up --build ia_analyst
+```
+
 ## 📋 Services Disponibles
 
 | Service | Port | URL | Description |
@@ -60,6 +68,7 @@ docker compose up -d
 | Gemini | 5001 | http://localhost:5001 | Analyse PDF |
 | DeepSeek | 5002 | http://localhost:5002 | IA orchestration |
 | OCR | 5003 | http://localhost:5003 | Extraction texte |
+| IA Analyst | - | - | Pipeline d'analyse de données (embeddings, détection risques) |
 | PostgreSQL | 5432 | - | Base de données |
 | Redis | 6379 | - | Cache |
 
@@ -115,6 +124,8 @@ DEEPSEEK_API_KEY=sk-ccc37a109afb461989af8cf994a8bc60
 GEMINI_API_KEY=AIzaSy...
 OPENAI_API_KEY=sk-proj-...
 ANTHROPIC_API_KEY=sk-ant-...
+OLLAMA_ENDPOINT=http://localhost:11434
+OLLAMA_MODEL=your_model_name
 
 # Database
 POSTGRES_USER=pgiia
